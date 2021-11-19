@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class LogJob implements ShouldQueue
+class LogJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -34,5 +34,10 @@ class LogJob implements ShouldQueue
     public function handle()
     {
         MixLogService::setApplication($this->application)->getRecords();
+    }
+
+    public function uniqueId()
+    {
+        return $this->application->id;
     }
 }
