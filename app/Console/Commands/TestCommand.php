@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Facades\MixLogService;
+use App\Jobs\LogJob;
 use App\Models\Application;
 use Illuminate\Console\Command;
 
@@ -40,7 +41,8 @@ class TestCommand extends Command
     public function handle()
     {
         foreach(Application::all() as $application) {
-            MixLogService::setApplication($application)->getRecords();
+            //MixLogService::setApplication($application)->getRecords();
+            dispatch( new LogJob( $application ) );
         }
         return Command::SUCCESS;
     }
