@@ -1,0 +1,48 @@
+<?php
+
+use App\Models\Application;
+use App\Models\Log;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+Route::get('log/{sessionid}', function( $sessionid ) {
+    if( !Str::startsWith($sessionid, 'nvaa') ) {
+        $sessionid = 'nvaa'.$sessionid;
+    }
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+
+    $logs = $logs->groupBy('service');
+
+    //return $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    $contents = $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $filename = $sessionid.'.json';
+    return response()->streamDownload(function () use ($contents) {
+        echo $contents;
+    }, $filename);
+});
+
+Route::get('/logs/{application}', function (Application $application) {
+    return view('logs-list', ['application' => $application]);
+})->middleware(['auth'])->name('logs');
+
+require __DIR__.'/auth.php';
