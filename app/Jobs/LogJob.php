@@ -12,7 +12,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class LogJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ShouldBeUnique;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $application;
 
