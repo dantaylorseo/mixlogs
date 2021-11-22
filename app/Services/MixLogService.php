@@ -250,6 +250,7 @@ class MixLogService {
                     'headers' => $this->_getHeaders()
                 ]
             );
+            $this->_delete_consumer();
             return;
         }
 
