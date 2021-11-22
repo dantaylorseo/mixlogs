@@ -102,10 +102,12 @@ class MixLogService {
     private function _delete_consumer() {
         $response = Http::withHeaders($this->_getHeaders())->delete($this->_getBaseUrl().'/consumers');
 
-        dump( $this->_getHeaders() );
+        //dump( $this->_getHeaders() );
         if( !$response->successful() ) {
-            dump( $response->body() );
-            throw new MixLogException($response->status(). ": Error deleting consumer", $response->status() );
+            //dump( $response->body() );
+            //throw new MixLogException($response->status(). ": Error deleting consumer", $response->status() );
+            Logger::error($response->status(). ": Error deleting consumer", ['body' => $response->body() || 'n/a' ]);
+            return false;
         }
 
         return;
