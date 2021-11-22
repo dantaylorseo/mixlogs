@@ -246,7 +246,8 @@ class MixLogService {
             Logger::error("Error getting records",
                 [
                     'application' => $this->application->name,
-                    'body' => $response->status()
+                    'status' => $response->status(),
+                    'headers' => $this->_getHeaders()
                 ]
             );
             return;
