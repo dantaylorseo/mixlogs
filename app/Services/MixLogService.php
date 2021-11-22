@@ -235,6 +235,12 @@ class MixLogService {
         dump( "Running... $loop (".$this->application->name.")" );
         Logger::info( "Running... $loop (".$this->application->name.")" );
 
+        $last = Log::orderByDesc('offset')->first();
+
+        if( !empty( $last ) ) {
+            $this->_commitOffset( $last->offset );
+        }
+
         //$response = null;
         //unset( $response );
 
@@ -299,11 +305,6 @@ class MixLogService {
         
         gc_collect_cycles();
 
-        $last = Log::orderByDesc('offset')->first();
-
-        if( !empty( $last ) ) {
-            $this->_commitOffset( $last->offset );
-        }
         //dump( $response->json() );
         try{
             if( !empty( $response->json() ) ) {
