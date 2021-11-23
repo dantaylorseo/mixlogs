@@ -13,6 +13,7 @@ class LogsTable extends Component
     
     public $application;
     public $sessionid = null;
+    public $textSearch = null;
 
     protected $queryString = [
         'page' => ['except' => 1],
@@ -20,11 +21,17 @@ class LogsTable extends Component
 
     public function render()
     {
-        $logs = Session::where('application_id', $this->application->id)->orderByDesc('timestamp')->withCount('logs');
+        $logs = Session::where('application_id', $this->application->id);
+        if( !empty( $this->textSearch ) ) {
+            $logs = $logs->whereHas('logs', function($query) {
+                $query->whereRaw("MATCH(data) AGAINST(? IN BOOLEAN MODE)", $this->textSearch);
+            });
+        } 
+        
         if( !empty( $this->sessionid ) ) {
             $logs = $logs->where('sessionid', 'LIKE', '%'.$this->sessionid.'%');
         }
-        $logs = $logs->paginate(10);
+        $logs = $logs->orderByDesc('timestamp')->withCount('logs')->paginate(10);
         
         return view('livewire.logs-table', ['logs' => $logs]);
     }
