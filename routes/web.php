@@ -35,10 +35,20 @@ Route::get('log/{sessionid}', function( $sessionid ) {
     //return $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     $contents = $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $filename = $sessionid.'.txt';
-    return response()->streamDownload(function () use ($contents) {
-        echo $contents;
-    }, $filename);
+    $filename = $sessionid.'.json';
+    $headers = array(
+        "Content-type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=$filename",
+        "Pragma" => "no-cache",
+        "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+        "Expires" => "0"
+    );
+
+    // return response()->streamDownload(function () use ($contents) {
+    //     echo $contents;
+    // }, $filename);
+
+    return Response::stream($contents, 200, $headers)->send();
 });
 
 Route::get('/logs/{application}', function (Application $application) {
