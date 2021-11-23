@@ -24,8 +24,9 @@ class LogsTable extends Component
         $logs = Session::where('application_id', $this->application->id);
         if( !empty( $this->textSearch ) ) {
             $logs = $logs->whereHas('logs', function($query) {
-                $query->whereRaw("MATCH(data) AGAINST(? IN BOOLEAN MODE)", $this->textSearch);
+                $query->whereRaw("MATCH(`logs`.`data`) AGAINST('$this->textSearch' IN BOOLEAN MODE)");
             });
+            //dd( $logs->toSql() );
         } 
         
         if( !empty( $this->sessionid ) ) {
