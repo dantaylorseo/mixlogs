@@ -48,7 +48,9 @@ Route::get('log/{sessionid}', function( $sessionid ) {
     //     echo $contents;
     // }, $filename);
 
-    return Response::stream($logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 200, $headers)->send();
+    return Response::stream(function () use($contents) {
+        echo $contents;
+    }, 200, $headers)->send();
 });
 
 Route::get('/logs/{application}', function (Application $application) {
