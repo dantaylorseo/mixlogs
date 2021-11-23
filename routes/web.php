@@ -35,7 +35,7 @@ Route::get('log/{sessionid}', function( $sessionid ) {
     //return $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     $contents = $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $filename = $sessionid.'.json';
+    $filename = $sessionid.'.txt';
     return response()->streamDownload(function () use ($contents) {
         echo $contents;
     }, $filename);
