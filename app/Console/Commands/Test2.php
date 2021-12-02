@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Facades\MixLogService;
 use App\Models\Application;
+use App\Models\Log;
+use App\Models\Session;
 use Illuminate\Console\Command;
 
 class Test2 extends Command
@@ -39,6 +41,10 @@ class Test2 extends Command
      */
     public function handle()
     {
+
+        Log::where('application_id', 1)->delete();
+        Session::where('application_id', 1)->delete();
+
         $application = Application::find(1);
         MixLogService::setApplication($application)->resetOffset()->getRecords();
         return Command::SUCCESS;
