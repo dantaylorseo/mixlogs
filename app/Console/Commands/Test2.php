@@ -42,8 +42,18 @@ class Test2 extends Command
     public function handle()
     {
 
-        Log::where('application_id', 1)->delete();
-        Session::where('application_id', 1)->delete();
+        do {
+            $deleted = Log::where('application_id', 1)->limit(1000)->delete();
+            sleep(1);
+        } while ($deleted > 0);
+
+        do {
+            $deleted = Session::where('application_id', 1)->limit(1000)->delete();
+            sleep(1);
+        } while ($deleted > 0);
+
+        // Log::where('application_id', 1)->delete();
+        // Session::where('application_id', 1)->delete();
 
         // $application = Application::find(1);
         // MixLogService::setApplication($application)->resetOffset()->getRecords();
