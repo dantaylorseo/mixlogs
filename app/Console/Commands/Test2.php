@@ -40,7 +40,7 @@ class Test2 extends Command
     public function handle()
     {
         $application = Application::find(1);
-        MixLogService::setApplication($application)->getRecords();
+        MixLogService::setApplication($application)->resetOffset()->getRecords();
         return Command::SUCCESS;
     }
 }
