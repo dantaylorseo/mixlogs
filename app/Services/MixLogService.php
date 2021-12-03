@@ -416,6 +416,7 @@ class MixLogService {
         //$this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
+        $this->resetOffset();
         return $this;
     }
 }
