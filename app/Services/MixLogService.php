@@ -241,6 +241,8 @@ class MixLogService {
 
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
+        } else {
+            $this->_commitOffset( 0 );
         }
 
         //$response = null;
