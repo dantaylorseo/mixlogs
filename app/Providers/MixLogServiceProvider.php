@@ -14,7 +14,7 @@ class MixLogServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('MixLogService', function($app){
+        $this->app->scoped('MixLogService', function($app){
             return new MixLogService();
         });
     }
