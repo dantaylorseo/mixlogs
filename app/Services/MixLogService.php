@@ -325,7 +325,7 @@ class MixLogService {
                 
             }
             if( !empty( $logs ) ) {
-                Log::upsert( $logs, ['id'], [ 'id', 'application_id', 'service', 'source', 'timestamp', 'appid', 'traceid', 'requestid', 'sessionid', 'locale', 'seqid', 'offset', 'events', 'request', 'response', 'data'] );
+                Log::upsert( $logs, ['id'], [ 'application_id', 'service', 'source', 'timestamp', 'appid', 'traceid', 'requestid', 'sessionid', 'locale', 'seqid', 'offset', 'events', 'request', 'response', 'data' ] );
             }
         }
         //$response->close();
