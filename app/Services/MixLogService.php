@@ -17,7 +17,7 @@ class MixLogService {
     private $access_token = null;
     private $consumer_group = null;
     
-    private $offset_reset = "earliest";
+    private $offset_reset = "latest";
     private $timeout = 10000;
     private $min_bytes = -1;
     private $auto_commit = false;
@@ -45,6 +45,7 @@ class MixLogService {
         ]);
 
         if( !$response->successful() ) {
+            $response->close();
             throw new MixLogAuthenticationException("Authentication error", $response->status() );
         }
 
@@ -54,6 +55,7 @@ class MixLogService {
             $this->access_token = $json['access_token'];
         }
 
+        $response->close();
         return;
     }
 
@@ -88,9 +90,11 @@ class MixLogService {
 
         if( !$response->successful() && $response->status() != 409 ) {
             dump( $response->json() );
+            $response->close();
             throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
         }
 
+        $response->close();
         return;
     }
 
@@ -106,10 +110,16 @@ class MixLogService {
         if( !$response->successful() ) {
             //dump( $response->body() );
             //throw new MixLogException($response->status(). ": Error deleting consumer", $response->status() );
-            Logger::error($response->status(). ": Error deleting consumer", ['body' => $response->body() || 'n/a' ]);
+            $response->close();
+            try {
+                Logger::error($response->status(). ": Error deleting consumer", ['body' => $response->body() || 'n/a' ]);
+            } catch( \Exception $e) {
+
+            }
             return false;
         }
 
+        $response->close();
         return;
     }
 
@@ -132,9 +142,11 @@ class MixLogService {
 
         if( !$response->successful() ) {
             dump( $response->body() );
+            $response->close();
             throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
         }
 
+        $response->close();
     }
 
     private function _assignPartitions() {
@@ -153,9 +165,11 @@ class MixLogService {
 
         if( !$response->successful() ) {
             dump( $response->body() );
+            $response->close();
             throw new MixLogException($response->status(). ": Error assigning parititions", $response->status() );
         }
 
+        $response->close();
         return $this;
 
     }
@@ -176,10 +190,12 @@ class MixLogService {
 
         if( !$response->successful() ) {
             dump( $response->body() );
+            $response->close();
             throw new MixLogException($response->status(). ": Error getting offset", $response->status() );
         }
 
         dump( $response->json() );
+        $response->close();
     }
 
     public function resetOffset() {
@@ -199,9 +215,11 @@ class MixLogService {
 
         if( !$response->successful() ) {
             dump( $response->body() );
+            $response->close();
             throw new MixLogException($response->status(). ": Error resetting offset", $response->status() );
         }
 
+        $response->close();
         return $this;
     }
 
@@ -222,9 +240,12 @@ class MixLogService {
 
         if( !$response->successful() ) {
             dump( $response->body() );
+            $response->close();
             // throw new MixLogException($response->status(). ": Error committing offset", $response->status() );
             return false;
         }
+        $response->close();
+        return;
     }
 
     /**
@@ -234,6 +255,12 @@ class MixLogService {
      */
     public function getRecords( $loop = 1, $total = 0 ) {
 
+        unset($response);
+        unset($last);
+        unset($logs);
+        unset($log);
+        unset($session);
+
         dump( "Running... $loop (".$this->application->name.")" );
         Logger::info( "Running... $loop (".$this->application->name.")" );
 
@@ -241,9 +268,10 @@ class MixLogService {
 
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
-        } else {
-            $this->_commitOffset( 0 );
-        }
+        } 
+        // else {
+        //     $this->_commitOffset( 0 );
+        // }
 
         //$response = null;
         //unset( $response );
@@ -267,24 +295,13 @@ class MixLogService {
         if( !empty( $response->json() ) ) {
             $logs = [];
             foreach( $response->json() as $log ) {
-                // $logs[] = [
-                //     'id' => $log['key']['id'],
-                //     'application_id' => $this->application->id,
-                //     'service' => $log['value']['service'],
-                //     'source' => $log['value']['source'],
-                //     'timestamp' => Carbon::parse($log['value']['timestamp']),
-                //     'appid' => $log['value']['appid'],
-                //     'traceid' => $log['value']['data']['traceid'],
-                //     'requestid' => $log['value']['data']['requestid'],
-                //     'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
-                //     'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
-                //     'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
-                //     'offset' => $log['offset'],
-                //     'events' => !empty( $log['value']['data']['events'] ) ? $log['value']['data']['events'] : null,
-                //     'request' => !empty( $log['value']['data']['request'] ) ? $log['value']['data']['request'] : null,
-                //     'response' => !empty( $log['value']['data']['response'] ) ? $log['value']['data']['response'] : null,
-                //     'data' => !empty( $log['value']['data'] ) ? $log['value']['data'] : null,
-                // ];
+
+                $timestamp = Carbon::parse($log['value']['timestamp']);
+                dump( $timestamp->toDateTimeString() );
+                if( !$timestamp->isToday() ) {
+                    
+                    continue;
+                }
 
                 $log = Log::updateOrCreate(
                     [
@@ -349,6 +366,8 @@ class MixLogService {
                     ]
                 );
                 $response->close();
+                unset($response);
+                $response = null;
                 $this->getRecords( $loop += 1, $total );
             } else {
                 dump( "Memory usage  ".memory_get_usage() );
@@ -359,6 +378,7 @@ class MixLogService {
                         'memory' => memory_get_usage()
                     ]
                 );
+                $response->close();
             }
         } catch( \RuntimeException $e ) {
             dump( "Memory usage  ".memory_get_usage() );
@@ -438,10 +458,11 @@ class MixLogService {
         $this->application = $application;
         $this->_generate_consumer_group_name();
         $this->_authenticate();
-        //$this->_delete_consumer();
+        $this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
-        $this->resetOffset();
+        //$this->_commitOffset(41375826);
+        //$this->resetOffset();
         return $this;
     }
 }

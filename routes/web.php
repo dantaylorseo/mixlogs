@@ -24,7 +24,37 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
+
 Route::get('log/{sessionid}', function( $sessionid ) {
+    if( !Str::startsWith($sessionid, 'nvaa') ) {
+        $sessionid = 'nvaa'.$sessionid;
+    }
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+
+    //$logs = $logs->groupBy('service');
+
+    return $logs;
+
+    // $contents = $logs->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    // $filename = $sessionid.'.json';
+    // $headers = array(
+    //     "Content-type" => "text/csv",
+    //     "Content-Disposition" => "attachment; filename=$filename",
+    //     "Pragma" => "no-cache",
+    //     "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+    //     "Expires" => "0"
+    // );
+
+    // // return response()->streamDownload(function () use ($contents) {
+    // //     echo $contents;
+    // // }, $filename);
+
+    // return Response::stream(function () use($contents) {
+    //     echo $contents;
+    // }, 200, $headers)->send();
+});
+
+Route::get('log/{sessionid}/download', function( $sessionid ) {
     if( !Str::startsWith($sessionid, 'nvaa') ) {
         $sessionid = 'nvaa'.$sessionid;
     }

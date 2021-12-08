@@ -42,7 +42,8 @@
                                     {{ $log->logs_count }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a target="_blank" href="{{ url('/log', $log->sessionid) }}" class="text-indigo-600 hover:text-indigo-900">View Log</a>
+                                    <a target="_blank" href="{{ url('/log', $log->sessionid) }}" class="text-indigo-600 hover:text-indigo-900">View</a> | 
+                                    <a href="{{ url('/log/'. $log->sessionid.'/download') }}" class="text-indigo-600 hover:text-indigo-900">Download</a>
                                 </td>
                             </tr>
                             @endforeach
