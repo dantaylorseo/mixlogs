@@ -223,6 +223,10 @@ class MixLogService {
         return $this;
     }
 
+    public function commitOffset($offset) {
+        return $this->_commitOffset( $offset );
+    }
+    
     private function _commitOffset( $offset ) {
         $clientIdParts = explode( ':', $this->application->client_id );
         
@@ -245,7 +249,8 @@ class MixLogService {
             return false;
         }
         $response->close();
-        return;
+        
+        return $this;
     }
 
     /**
@@ -264,7 +269,7 @@ class MixLogService {
         dump( "Running... $loop (".$this->application->name.")" );
         Logger::info( "Running... $loop (".$this->application->name.")" );
 
-        $last = Log::orderByDesc('offset')->first();
+        $last = Log::where('application_id', $this->application->id)->orderByDesc('offset')->first();
 
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
@@ -453,7 +458,7 @@ class MixLogService {
      *
      * @return  self
      */ 
-    public function setApplication(Application $application)
+    public function setApplication(Application $application, $commitOffset = null)
     {
         $this->application = $application;
         $this->_generate_consumer_group_name();
@@ -461,7 +466,7 @@ class MixLogService {
         $this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
-        //$this->_commitOffset(41375826);
+        if( !empty( $commitOffset ) )  $this->_commitOffset($commitOffset);
         //$this->resetOffset();
         return $this;
     }
