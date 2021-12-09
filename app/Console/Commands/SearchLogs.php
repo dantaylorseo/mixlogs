@@ -512,6 +512,7 @@ class SearchLogs extends Command
         $this->info( count( $countArray6) );
         $this->info( $sessions->count() );
         $csv = [];
+        $foundMax =[];
         foreach( $sessions as $session ) {
             // $maxcontext = 0;
             // foreach( $session->logs() as $log ) {
