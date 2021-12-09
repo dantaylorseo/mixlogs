@@ -498,7 +498,7 @@ class SearchLogs extends Command
 
         $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
             $query
-                  ->where("events", "LIKE", '%"helpAPIReturnResponse":{"chatAvailable":false}}}%')
+                  ->where("events", "LIKE", '%"chatAvailable":false%')
                   ;
         })->get();
 
