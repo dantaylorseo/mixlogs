@@ -507,6 +507,11 @@ class SearchLogs extends Command
                 ->where("logs.data", "LIKE", '%"chatAvailable":false%');
         })->get();
 
+        dump($sessions = Session::whereIn('sessionid', $countArray6)->join('logs', function($join) {
+            $join->on('logs.sessionid', '=', 'sessions.sessionid')
+                ->where("logs.data", "LIKE", '%"chatAvailable":false%');
+        })->toSql());
+
         //$sessions = Log::whereIn('sessionid', $countArray6)->where("data", "LIKE", '%"chatAvailable":false%')->get();
 
         // $sessions = Session::whereIn('sessionid', $countArray4)->whereHas('logs', function($query) {
