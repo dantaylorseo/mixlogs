@@ -531,11 +531,11 @@ class SearchLogs extends Command
             // foreach( $session->logs() as $log ) {
 
             // }
-             $this->info( "http://127.0.0.1:8000/log/".$session->sessionid );
+             //$this->info( "http://127.0.0.1:8000/log/".$session->sessionid );
             $foundMax[] = $session->sessionid;
             $csv[] = Str::replace('nvaa', '', $session->sessionid);
         }
-        dump(array_diff($countArray6, $foundMax));
+        //dump(array_diff($countArray6, $foundMax));
         //dump( $csv);
 
         // dump("Max:" . $foundMax);
