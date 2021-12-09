@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Log;
 use App\Models\Session;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -496,11 +497,17 @@ class SearchLogs extends Command
         // $this->info("Found $found/$total ($percent%)");
 
 
-        $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
-            $query
-                  ->where("data", "LIKE", '%"chatAvailable":false%')
-                  ;
+        // $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
+        //     $query
+        //           ->where("data", "LIKE", '%"chatAvailable":false%')
+        //           ;
+        // })->get();
+        $sessions = Session::whereIn('sessionid', $countArray6)->join('logs', function($join) {
+            $join->on('logs.sessionid', '=', 'sessions.sessionid')
+                ->where("logs.data", "LIKE", '%"chatAvailable":false%');
         })->get();
+
+        //$sessions = Log::whereIn('sessionid', $countArray6)->where("data", "LIKE", '%"chatAvailable":false%')->get();
 
         // $sessions = Session::whereIn('sessionid', $countArray4)->whereHas('logs', function($query) {
         //     $query
