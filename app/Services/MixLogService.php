@@ -302,7 +302,7 @@ class MixLogService {
             foreach( $response->json() as $log ) {
 
                 $timestamp = Carbon::parse($log['value']['timestamp']);
-                dump( $timestamp->toDateTimeString() );
+                //dump( $timestamp->toDateTimeString() );
                 if( !$timestamp->isToday() ) {
                     
                     continue;
