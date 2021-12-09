@@ -535,7 +535,7 @@ class SearchLogs extends Command
             $foundMax[] = $session->sessionid;
             $csv[] = Str::replace('nvaa', '', $session->sessionid);
         }
-        //dump(array_diff($countArray6, $foundMax));
+        dump(array_diff($countArray6, $foundMax));
         //dump( $csv);
 
         // dump("Max:" . $foundMax);
