@@ -55,7 +55,7 @@ class Test2 extends Command
         // Log::where('application_id', 1)->delete();
         // Session::where('application_id', 1)->delete();
 
-        $application = Application::find(1);
+        $application = Application::find(2);
         MixLogService::setApplication($application)
         ->setTimeout(10 * 1000)
         // ->resetOffset()

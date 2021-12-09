@@ -318,6 +318,7 @@ class SearchLogs extends Command
         $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
             $query
                   ->where("events", "LIKE", '%Read timed out%')
+                  //->whereRaw('MATCH (`data`) AGAINST (\'""\'  IN BOOLEAN MODE)')
                   //->where('data', "LIKE", "%cp64_HelpAPIFail_MS%")
                   ;
         })->get();
