@@ -532,13 +532,15 @@ class SearchLogs extends Command
 
             // }
              //$this->info( "http://127.0.0.1:8000/log/".$session->sessionid );
+            $logs = $session->logs();
             $foundMax[] = [
                 'sessionid' => $session->sessionid,
+                'timestamp' => $logs->where("data", "LIKE", '%"chatAvailable":false%')->first()->timestamp
             ];
             $csv[] = Str::replace('nvaa', '', $session->sessionid);
         }
-        dump(array_diff($countArray6, $foundMax));
-        //dump( $csv);
+        //dump(array_diff($countArray6, $foundMax));
+        dump( $foundMax);
 
         // dump("Max:" . $foundMax);
 
