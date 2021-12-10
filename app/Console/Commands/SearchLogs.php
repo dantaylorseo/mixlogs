@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Log;
 use App\Models\Session;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -498,9 +499,10 @@ class SearchLogs extends Command
         // $this->info("Found $found/$total ($percent%)");
 
 
-        $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
+        //$sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
+        $sessions = Session::whereBetween('timestamp', [Carbon::parse('2021-12-09 17:00:00'), Carbon::parse('2021-12-09 18:00:00')])->whereHas('logs', function($query) {
             $query
-                  ->where("data", "LIKE", '%"chatAvailable":false%')
+                  ->where("data", "LIKE", '%"chatAvailable":true%')
                   ;
         })->get();
         // $sessions = Session::whereIn('sessions.sessionid', $countArray6)->join('logs', function($join) {
