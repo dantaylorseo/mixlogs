@@ -535,12 +535,12 @@ class SearchLogs extends Command
             $logs = $session->logs();
             $foundMax[] = [
                 'sessionid' => $session->sessionid,
-                'timestamp' => $logs->where("data", "LIKE", '%"chatAvailable":false%')->first()->timestamp->toDateTimeString()
+                'timestamp' => $logs->where("data", "LIKE", '%"chatAvailable":true%')->first()->timestamp->toDateTimeString()
             ];
             $csv[] = Str::replace('nvaa', '', $session->sessionid);
         }
         //dump(array_diff($countArray6, $foundMax));
-        dump( $foundMax);
+        //dump( $foundMax);
 
         // dump("Max:" . $foundMax);
 
