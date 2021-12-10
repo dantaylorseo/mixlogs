@@ -498,7 +498,7 @@ class SearchLogs extends Command
         // $this->info("Found $found/$total ($percent%)");
 
 
-        $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
+        $sessions = Session::whereIn('sessionid', $countArray6)->with('logs', function($query) {
             $query
                   ->where("data", "LIKE", '%"chatAvailable":false%')
                   ;
