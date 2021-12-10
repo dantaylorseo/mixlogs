@@ -498,7 +498,7 @@ class SearchLogs extends Command
         // $this->info("Found $found/$total ($percent%)");
 
 
-        $sessions = Session::whereIn('sessionid', $countArray6)->with('logs', function($query) {
+        $sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
             $query
                   ->where("data", "LIKE", '%"chatAvailable":false%')
                   ;
@@ -508,10 +508,10 @@ class SearchLogs extends Command
         //         ->where("logs.data", "LIKE", '%"chatAvailable":false%');
         // })->get();
 
-        dump(Session::whereIn('sessions.sessionid', $countArray6)->join('logs', function($join) {
-            $join->on('logs.sessionid', '=', 'sessions.sessionid')
-                ->where("logs.data", "LIKE", '%"chatAvailable":false%');
-        })->toSql());
+        // dump(Session::whereIn('sessions.sessionid', $countArray6)->join('logs', function($join) {
+        //     $join->on('logs.sessionid', '=', 'sessions.sessionid')
+        //         ->where("logs.data", "LIKE", '%"chatAvailable":false%');
+        // })->toSql());
 
         //$sessions = Log::whereIn('sessionid', $countArray6)->where("data", "LIKE", '%"chatAvailable":false%')->get();
 
@@ -532,7 +532,9 @@ class SearchLogs extends Command
 
             // }
              //$this->info( "http://127.0.0.1:8000/log/".$session->sessionid );
-            $foundMax[] = $session->sessionid;
+            $foundMax[] = [
+                'sessionid' => $session->sessionid,
+            ];
             $csv[] = Str::replace('nvaa', '', $session->sessionid);
         }
         dump(array_diff($countArray6, $foundMax));
