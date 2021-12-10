@@ -500,7 +500,7 @@ class SearchLogs extends Command
 
 
         //$sessions = Session::whereIn('sessionid', $countArray6)->whereHas('logs', function($query) {
-        $sessions = Session::whereBetween('timestamp', [Carbon::parse('2021-12-09 17:00:00'), Carbon::parse('2021-12-09 18:00:00')])->whereHas('logs', function($query) {
+        $sessions = Session::whereBetween('timestamp', [Carbon::parse('2021-12-09 16:30:00'), Carbon::parse('2021-12-09 18:10:00')])->whereHas('logs', function($query) {
             $query
                   ->where("data", "LIKE", '%"chatAvailable":true%')
                   ;
