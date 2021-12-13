@@ -267,7 +267,7 @@ class MixLogService {
         unset($session);
 
         dump( "Running... $loop (".$this->application->name.")" );
-        Logger::info( "Running... $loop (".$this->application->name.")" );
+        Logger::info( "(".$this->application->name.") - Running... $loop " );
 
         $last = Log::where('application_id', $this->application->id)->orderByDesc('offset')->first();
 
@@ -286,7 +286,7 @@ class MixLogService {
         if( !$response->successful() ) {
             $response->close();
             //throw new MixLogException($response->status(). ": Error getting records", $response->status() );
-            Logger::error("Error getting records",
+            Logger::error("(".$this->application->name.") - Error getting records",
                 [
                     'application' => $this->application->name,
                     'status' => $response->status(),
@@ -299,6 +299,12 @@ class MixLogService {
 
         if( !empty( $response->json() ) ) {
             $logs = [];
+            Logger::info("(".$this->application->name.") - Fetched Rows", 
+                [
+                    'application' => $this->application->name,
+                    'fetched' => count( $response->json() )
+                ]
+            );
             foreach( $response->json() as $log ) {
 
                 $timestamp = Carbon::parse($log['value']['timestamp']);
@@ -362,7 +368,7 @@ class MixLogService {
                 dump( "Total ".$total." rows" );
                 dump( "Memory usage  ".memory_get_usage() );
                 dump( "***********************************" );
-                Logger::info('Got new rows', 
+                Logger::info("(".$this->application->name.") - Got new rows", 
                     [
                         'application' => $this->application->name,
                         'added' => count( $response->json() ),
@@ -377,7 +383,7 @@ class MixLogService {
             } else {
                 dump( "Memory usage  ".memory_get_usage() );
                 dump( "No logs" );
-                Logger::info('No new rows', 
+                Logger::info("(".$this->application->name.") - No new rows", 
                     [
                         'application' => $this->application->name,
                         'memory' => memory_get_usage()
@@ -388,7 +394,7 @@ class MixLogService {
         } catch( \RuntimeException $e ) {
             dump( "Memory usage  ".memory_get_usage() );
             dump( "No logs (Catch)" );
-            Logger::info('No new rows (catch)', 
+            Logger::info("(".$this->application->name.") - No new rows (catch)", 
                 [
                     'application' => $this->application->name,
                     'memory' => memory_get_usage()
