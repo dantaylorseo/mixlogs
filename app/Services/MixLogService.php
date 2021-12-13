@@ -240,7 +240,7 @@ class MixLogService {
             ]
         ];
 
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers/offsets', $body);
+        $response = Http::withHeaders($this->_getHeaders())->timeout(5)->post($this->_getBaseUrl().'/consumers/offsets', $body);
 
         if( !$response->successful() ) {
             dump( $response->body() );
@@ -268,9 +268,7 @@ class MixLogService {
 
         dump( "Running... $loop (".$this->application->name.")" );
         Logger::info( "(".$this->application->name.") - Running... $loop " );
-
         $last = Log::where('application_id', $this->application->id)->orderByDesc('offset')->first();
-
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
         } 
@@ -308,7 +306,7 @@ class MixLogService {
             foreach( $response->json() as $log ) {
 
                 $timestamp = Carbon::parse($log['value']['timestamp']);
-                //dump( $timestamp->toDateTimeString() );
+                dump( $timestamp->toDateTimeString() );
                 if( !$timestamp->isToday() ) {
                     
                     //continue;
