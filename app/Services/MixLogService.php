@@ -305,7 +305,7 @@ class MixLogService {
                 //dump( $timestamp->toDateTimeString() );
                 if( !$timestamp->isToday() ) {
                     
-                    continue;
+                    //continue;
                 }
 
                 $log = Log::updateOrCreate(

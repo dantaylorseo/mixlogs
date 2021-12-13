@@ -6,6 +6,7 @@ use App\Facades\MixLogService;
 use App\Jobs\LogJob;
 use App\Models\Application;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class TestCommand extends Command
 {
@@ -42,6 +43,7 @@ class TestCommand extends Command
     {
         foreach(Application::all() as $application) {
             //MixLogService::setApplication($application)->getRecords();
+            Log::info("Adding ".$application->name." to queue");
             dispatch( new LogJob( $application ) );
         }
         return Command::SUCCESS;
