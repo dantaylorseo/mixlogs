@@ -13,7 +13,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 
-class LogJob implements ShouldQueue, ShouldBeUnique
+class LogJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
