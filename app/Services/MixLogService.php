@@ -228,6 +228,9 @@ class MixLogService {
     }
     
     private function _commitOffset( $offset ) {
+
+        dump( "(".$this->application->name.") - Committing Offset: ".$offset );
+
         $clientIdParts = explode( ':', $this->application->client_id );
         
         $body = [
@@ -272,6 +275,7 @@ class MixLogService {
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
         } 
+        dump( "(".$this->application->name.") - Committed Offset" );
         // else {
         //     $this->_commitOffset( 0 );
         // }
