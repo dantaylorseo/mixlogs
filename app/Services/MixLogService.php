@@ -229,7 +229,7 @@ class MixLogService {
     
     private function _commitOffset( $offset ) {
 
-        dump( "(".$this->application->name.") - Committing Offset: ".$offset );
+        Logger::info( "(".$this->application->name.") - Committing Offset: ".$offset );
 
         $clientIdParts = explode( ':', $this->application->client_id );
         
@@ -246,7 +246,7 @@ class MixLogService {
         $response = Http::withHeaders($this->_getHeaders())->timeout(5)->post($this->_getBaseUrl().'/consumers/offsets', $body);
 
         if( !$response->successful() ) {
-            dump( $response->body() );
+            Logger::info( $response->body() );
             $response->close();
             // throw new MixLogException($response->status(). ": Error committing offset", $response->status() );
             return false;
@@ -274,9 +274,9 @@ class MixLogService {
         $last = Log::where('application_id', $this->application->id)->orderByDesc('offset')->first();
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
-            dump( "(".$this->application->name.") - Committed Offset" );
+            Logger::info( "(".$this->application->name.") - Committed Offset" );
         } else {
-            dump( "(".$this->application->name.") - NO Offset" );
+            Logger::info( "(".$this->application->name.") - NO Offset" );
         } 
         
         // else {
