@@ -274,8 +274,11 @@ class MixLogService {
         $last = Log::where('application_id', $this->application->id)->orderByDesc('offset')->first();
         if( !empty( $last ) ) {
             $this->_commitOffset( $last->offset );
+            dump( "(".$this->application->name.") - Committed Offset" );
+        } else {
+            dump( "(".$this->application->name.") - NO Offset" );
         } 
-        dump( "(".$this->application->name.") - Committed Offset" );
+        
         // else {
         //     $this->_commitOffset( 0 );
         // }
