@@ -37,6 +37,7 @@ class LogJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
+        Log::info("Added ".$this->application->name." to queue");
         MixLogService::setApplication($this->application)->getRecords();
     }
 
