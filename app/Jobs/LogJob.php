@@ -26,6 +26,8 @@ class LogJob implements ShouldQueue, ShouldBeUnique
         $this->application = $application;
     }
 
+    public $uniqueFor = 70;
+
     /**
      * Execute the job.
      *
