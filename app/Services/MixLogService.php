@@ -271,8 +271,7 @@ class MixLogService {
 
         dump( "Running... $loop (".$this->application->name.")" );
         Logger::info( "(".$this->application->name.") - Running... $loop " );
-        $last = Log::where('application_id', $this->application->id)->max('offset');
-        //dd( $last );
+        $last = $this->application->offset;
         if( !empty( $last ) ) {
             $this->_commitOffset( $last );
             Logger::info( "(".$this->application->name.") - Committed Offset" );
@@ -342,6 +341,9 @@ class MixLogService {
                         'data' => !empty( $log['value']['data'] ) ? $log['value']['data'] : null,
                     ]
                 );
+
+                $this->application->offset = $log['offset'];
+                $this->application->save();
 
                 if( !empty( $log->sessionid ) ) {
                     $session = Session::firstOrNew([ 'sessionid' => $log->sessionid ]);
