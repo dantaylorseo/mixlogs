@@ -5,12 +5,13 @@ namespace App\Jobs;
 use Exception;
 use Illuminate\Bus\Queueable;
 use App\Facades\MixLogService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 class LogJob implements ShouldQueue, ShouldBeUnique
 {
@@ -28,7 +29,10 @@ class LogJob implements ShouldQueue, ShouldBeUnique
         $this->application = $application;
     }
 
-    public $uniqueFor = 60 * 10;
+    public function middleware()
+    {
+        return [new WithoutOverlapping($this->application->id)];
+    }
 
     /**
      * Execute the job.
@@ -41,7 +45,6 @@ class LogJob implements ShouldQueue, ShouldBeUnique
         MixLogService::setApplication($this->application)->getRecords();
     }
     
-
     /**
      * The job failed to process.
      *
