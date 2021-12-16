@@ -387,7 +387,7 @@ class MixLogService {
                 $response->close();
                 unset($response);
                 $response = null;
-                $this->getRecords( $loop += 1, $total );
+                //$this->getRecords( $loop += 1, $total );
             } else {
                 dump( "Memory usage  ".memory_get_usage() );
                 dump( "No logs" );
