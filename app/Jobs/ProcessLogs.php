@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\Log;
 use App\Models\Session;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,59 +51,68 @@ class ProcessLogs implements ShouldQueue
      */
     public function handle()
     {
-        foreach( $this->logs as $log ) {
 
-            $timestamp = Carbon::parse($log['value']['timestamp']);
-            if( !$timestamp->isToday() ) {
-                //continue;
-            }
-            try {
-                $log = Log::updateOrCreate(
-                    [
-                        'id' => $log['key']['id'],
-                    ],
-                    [
-                        'application_id' => $this->application->id,
-                        'service' => $log['value']['service'],
-                        'source' => $log['value']['source'],
-                        'timestamp' => Carbon::parse($log['value']['timestamp']),
-                        'appid' => $log['value']['appid'],
-                        'traceid' => $log['value']['data']['traceid'],
-                        'requestid' => $log['value']['data']['requestid'],
-                        'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
-                        'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
-                        'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
-                        'offset' => $log['offset'],
-                        'events' => !empty( $log['value']['data']['events'] ) ? $log['value']['data']['events'] : null,
-                        'request' => !empty( $log['value']['data']['request'] ) ? $log['value']['data']['request'] : null,
-                        'response' => !empty( $log['value']['data']['response'] ) ? $log['value']['data']['response'] : null,
-                        'data' => !empty( $log['value']['data'] ) ? $log['value']['data'] : null,
-                    ]
-                );
-            } catch( Exception $e ) {
-                //FacadesLog::error($e->getMessage());
-            }
+        
+
+        $logArray = [];
+        $count = 0;
+        $lastLog = [];
+
+        foreach( $this->logs as $log ) {
+            
+            $logArray[] = [
+                'id' => $log['key']['id'],
+                'application_id' => $this->application->id,
+                'service' => $log['value']['service'],
+                'source' => $log['value']['source'],
+                'timestamp' => Carbon::parse($log['value']['timestamp']),
+                'appid' => $log['value']['appid'],
+                'traceid' => $log['value']['data']['traceid'],
+                'requestid' => $log['value']['data']['requestid'],
+                'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
+                'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
+                'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
+                'offset' => $log['offset'],
+                'events' => !empty( $log['value']['data']['events'] ) ? json_encode($log['value']['data']['events']) : null,
+                'request' => !empty( $log['value']['data']['request'] ) ? json_encode($log['value']['data']['request']) : null,
+                'response' => !empty( $log['value']['data']['response'] ) ? json_encode($log['value']['data']['response']) : null,
+                'data' => !empty( $log['value']['data'] ) ? json_encode($log['value']['data']) : null,
+            ];
+                
+
+            
             // $this->application->offset = $log['offset'];
             // $this->application->save();
 
-            if( !empty( $log->sessionid ) ) {
+            
+            
+        }
+
+            DB::table('logs')->upsert( $logArray, 'id' );
+            $count = count( $logArray );
+            $lastLog = last( $logArray );
+            
+            if( !empty( $lastLog->sessionid ) ) {
                 try {
-                    $session = Session::firstOrNew([ 'sessionid' => $log->sessionid ]);
-                    $session->records = $session->records + 1;
+                    $session = Session::firstOrNew([ 'sessionid' => $lastLog->sessionid ]);
+                    $session->records = $session->records + $count;
                     $session->application_id = $this->application->id;
                     if( !empty( $session->timestamp ) ) {
-                        if( $session->timestamp->isAfter( $log->timestamp ) ) {
-                            $session->timestamp = $log->timestamp;
+                        if( $session->timestamp->isAfter( $lastLog->timestamp ) ) {
+                            $session->timestamp = $lastLog->timestamp;
                         }
                     } else {
-                        $session->timestamp = $log->timestamp;
+                        $session->timestamp = $lastLog->timestamp;
                     }
                     $session->save();
                 } catch( Exception $e ) {
                     FacadesLog::error($e->getMessage());
                 }
             }
-            
-        }
+
+        // } catch( Exception $e ) {
+        //     dump( $e );
+        // }
+
     }
 }

@@ -19,7 +19,7 @@ class MixLogService {
     private $consumer_group = null;
     
     private $offset_reset = "latest";
-    private $timeout = 15000;
+    private $timeout = 5000;
     private $min_bytes = -1;
     private $auto_commit = false;
 
@@ -313,10 +313,14 @@ class MixLogService {
             );
 
             $offset = 0;
-            $logsChunks = array_chunk($response->json(), 200);
-            foreach( $logsChunks as $chunk ) {
-                dispatch( new ProcessLogs($this->application, $chunk ) )->onQueue('logs')->onConnection('database2');
-                
+            //$logsChunks = array_chunk($response->json(), 200);
+
+            $logChunks = collect($logs)->groupBy(function($item, $key) {
+                return !empty( $item['value']['data']['sessionid'] ) ? $item['value']['data']['sessionid'] : (!empty($item['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $item['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : "n/a" );
+            });
+            //dd( $logChunks->first()->all() );
+            foreach( $logChunks as $chunk ) {
+                dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs')->onConnection('database2');   
             }
 
             $last = end( $logs );
