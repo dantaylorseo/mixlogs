@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Log;
 use App\Models\Session;
@@ -28,6 +29,17 @@ class ProcessLogs implements ShouldQueue
     {
         $this->application = $application;
         $this->logs = $logs;
+    }
+
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception)
+    {
+        Log::error("LogJob failed for Application: ".$this->application->name.". Error: ".$exception->getMessage() );
     }
 
     /**
