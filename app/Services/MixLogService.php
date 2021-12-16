@@ -19,7 +19,7 @@ class MixLogService {
     private $consumer_group = null;
     
     private $offset_reset = "latest";
-    private $timeout = 5000;
+    private $timeout = 15000;
     private $min_bytes = -1;
     private $auto_commit = false;
 
