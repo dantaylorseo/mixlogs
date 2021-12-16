@@ -90,7 +90,7 @@ class ProcessLogs implements ShouldQueue
 
             DB::table('logs')->upsert( $logArray, 'id' );
             $count = count( $logArray );
-            $lastLog = last( $logArray );
+            $lastLog = end( $logArray );
             
             if( !empty( $lastLog->sessionid ) ) {
                 try {
