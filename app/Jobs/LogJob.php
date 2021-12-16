@@ -29,10 +29,10 @@ class LogJob implements ShouldQueue, ShouldBeUnique
         $this->application = $application;
     }
 
-    public function middleware()
-    {
-        return [new WithoutOverlapping($this->application->id)];
-    }
+    // public function middleware()
+    // {
+    //     return [new WithoutOverlapping($this->application->id)];
+    // }
 
     /**
      * Execute the job.
