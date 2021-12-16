@@ -40,7 +40,7 @@ class ProcessLogs implements ShouldQueue
      */
     public function failed(Exception $exception)
     {
-        Log::error("LogJob failed for Application: ".$this->application->name.". Error: ".$exception->getMessage() );
+        FacadesLog::error("LogJob failed for Application: ".$this->application->name.". Error: ".$exception->getMessage() );
     }
 
     /**
