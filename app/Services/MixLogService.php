@@ -320,7 +320,7 @@ class MixLogService {
             });
             //dd( $logChunks->first()->all() );
             foreach( $logChunks as $chunk ) {
-                dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs')->onConnection('database2');   
+                dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs')->onConnection('database');   
             }
 
             $last = end( $logs );
