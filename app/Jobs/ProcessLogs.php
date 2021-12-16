@@ -91,23 +91,26 @@ class ProcessLogs implements ShouldQueue
             DB::table('logs')->upsert( $logArray, 'id' );
             $count = count( $logArray );
             $lastLog = end( $logArray );
-            
-            if( !empty( $lastLog->sessionid ) ) {
+            if( !empty( $lastLog['sessionid'] ) ) {
                 try {
-                    $session = Session::firstOrNew([ 'sessionid' => $lastLog->sessionid ]);
+                    $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
                     $session->records = $session->records + $count;
                     $session->application_id = $this->application->id;
                     if( !empty( $session->timestamp ) ) {
-                        if( $session->timestamp->isAfter( $lastLog->timestamp ) ) {
-                            $session->timestamp = $lastLog->timestamp;
+                        if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
+                            $session->timestamp = $lastLog['timestamp'];
                         }
                     } else {
-                        $session->timestamp = $lastLog->timestamp;
+                        $session->timestamp = $lastLog['timestamp'];
                     }
                     $session->save();
                 } catch( Exception $e ) {
+                    dump( "catch" );
+                    dump($e->getMessage());
                     FacadesLog::error($e->getMessage());
                 }
+            } else {
+                dump( "not found" );
             }
 
         // } catch( Exception $e ) {
