@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Exceptions\MixLogException;
 use Illuminate\Support\Facades\Http;
 use App\Exceptions\MixLogAuthenticationException;
+use App\Jobs\ProcessLogs;
 use App\Models\Session;
 use Illuminate\Support\Facades\Log as Logger;
 
@@ -310,56 +311,61 @@ class MixLogService {
                     'fetched' => count( $response->json() )
                 ]
             );
-            foreach( $response->json() as $log ) {
 
-                $timestamp = Carbon::parse($log['value']['timestamp']);
-                //dump( $timestamp->toDateTimeString() );
-                if( !$timestamp->isToday() ) {
-                    
-                    //continue;
-                }
-
-                $log = Log::updateOrCreate(
-                    [
-                        'id' => $log['key']['id'],
-                    ],
-                    [
-                        'application_id' => $this->application->id,
-                        'service' => $log['value']['service'],
-                        'source' => $log['value']['source'],
-                        'timestamp' => Carbon::parse($log['value']['timestamp']),
-                        'appid' => $log['value']['appid'],
-                        'traceid' => $log['value']['data']['traceid'],
-                        'requestid' => $log['value']['data']['requestid'],
-                        'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
-                        'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
-                        'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
-                        'offset' => $log['offset'],
-                        'events' => !empty( $log['value']['data']['events'] ) ? $log['value']['data']['events'] : null,
-                        'request' => !empty( $log['value']['data']['request'] ) ? $log['value']['data']['request'] : null,
-                        'response' => !empty( $log['value']['data']['response'] ) ? $log['value']['data']['response'] : null,
-                        'data' => !empty( $log['value']['data'] ) ? $log['value']['data'] : null,
-                    ]
-                );
-
-                $this->application->offset = $log['offset'];
-                $this->application->save();
-
-                if( !empty( $log->sessionid ) ) {
-                    $session = Session::firstOrNew([ 'sessionid' => $log->sessionid ]);
-                    $session->records = $session->records + 1;
-                    $session->application_id = $this->application->id;
-                    if( !empty( $session->timestamp ) ) {
-                        if( $session->timestamp->isAfter( $log->timestamp ) ) {
-                            $session->timestamp = $log->timestamp;
-                        }
-                    } else {
-                        $session->timestamp = $log->timestamp;
-                    }
-                    $session->save();
-                }
-                
+            $logsChunks = array_chunk($response->json(), 200);
+            foreach( $logsChunks as $chunk ) {
+                dispatch( new ProcessLogs($this->application, $chunk ) )->onQueue('logs')->onConnection('database2');
             }
+
+            // foreach( $response->json() as $log ) {
+
+            //     $timestamp = Carbon::parse($log['value']['timestamp']);
+            //     //dump( $timestamp->toDateTimeString() );
+            //     if( !$timestamp->isToday() ) {
+                    
+            //         //continue;
+            //     }
+            //     $log = Log::updateOrCreate(
+            //         [
+            //             'id' => $log['key']['id'],
+            //         ],
+            //         [
+            //             'application_id' => $this->application->id,
+            //             'service' => $log['value']['service'],
+            //             'source' => $log['value']['source'],
+            //             'timestamp' => Carbon::parse($log['value']['timestamp']),
+            //             'appid' => $log['value']['appid'],
+            //             'traceid' => $log['value']['data']['traceid'],
+            //             'requestid' => $log['value']['data']['requestid'],
+            //             'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
+            //             'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
+            //             'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
+            //             'offset' => $log['offset'],
+            //             'events' => !empty( $log['value']['data']['events'] ) ? $log['value']['data']['events'] : null,
+            //             'request' => !empty( $log['value']['data']['request'] ) ? $log['value']['data']['request'] : null,
+            //             'response' => !empty( $log['value']['data']['response'] ) ? $log['value']['data']['response'] : null,
+            //             'data' => !empty( $log['value']['data'] ) ? $log['value']['data'] : null,
+            //         ]
+            //     );
+
+            //     $this->application->offset = $log['offset'];
+            //     $this->application->save();
+
+            //     if( !empty( $log->sessionid ) ) {
+            //         $session = Session::firstOrNew([ 'sessionid' => $log->sessionid ]);
+            //         $session->records = $session->records + 1;
+            //         $session->application_id = $this->application->id;
+            //         if( !empty( $session->timestamp ) ) {
+            //             if( $session->timestamp->isAfter( $log->timestamp ) ) {
+            //                 $session->timestamp = $log->timestamp;
+            //             }
+            //         } else {
+            //             $session->timestamp = $log->timestamp;
+            //         }
+            //         $session->save();
+            //     }
+                
+            // }
             // if( !empty( $logs ) ) {
             //     Log::upsert( $logs, ['id'], [ 'application_id', 'service', 'source', 'timestamp', 'appid', 'traceid', 'requestid', 'sessionid', 'locale', 'seqid', 'offset', 'events', 'request', 'response', 'data' ] );
             // }
