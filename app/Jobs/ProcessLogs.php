@@ -80,10 +80,10 @@ class ProcessLogs implements ShouldQueue
                     ]
                 );
             } catch( Exception $e ) {
-                FacadesLog::error($e->getMessage());
+                //FacadesLog::error($e->getMessage());
             }
-            $this->application->offset = $log['offset'];
-            $this->application->save();
+            // $this->application->offset = $log['offset'];
+            // $this->application->save();
 
             if( !empty( $log->sessionid ) ) {
                 try {

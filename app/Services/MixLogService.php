@@ -304,7 +304,7 @@ class MixLogService {
         }
 
         if( !empty( $response->json() ) ) {
-            $logs = [];
+            $logs = $response->json();
             Logger::info("(".$this->application->name.") - Fetched Rows", 
                 [
                     'application' => $this->application->name,
@@ -312,10 +312,16 @@ class MixLogService {
                 ]
             );
 
+            $offset = 0;
             $logsChunks = array_chunk($response->json(), 200);
             foreach( $logsChunks as $chunk ) {
                 dispatch( new ProcessLogs($this->application, $chunk ) )->onQueue('logs')->onConnection('database2');
+                
             }
+
+            $last = end( $logs );
+            $this->application->offset = $last['offset'];
+            $this->application->save();
 
             // foreach( $response->json() as $log ) {
 
