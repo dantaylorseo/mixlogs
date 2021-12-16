@@ -287,7 +287,7 @@ class MixLogService {
         //$response = null;
         //unset( $response );
 
-        $response = Http::withHeaders($this->_getHeaders())->timeout(15)->get($this->_getBaseUrl().'/consumers/records');
+        $response = Http::withHeaders($this->_getHeaders())->timeout(30)->get($this->_getBaseUrl().'/consumers/records');
 
         if( !$response->successful() ) {
             $response->close();
