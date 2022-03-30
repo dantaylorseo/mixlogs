@@ -26,9 +26,9 @@ Route::get('/dashboard', function () {
 
 
 Route::get('log/{sessionid}', function( $sessionid ) {
-    if( !Str::startsWith($sessionid, 'nvaa') ) {
-        $sessionid = 'nvaa'.$sessionid;
-    }
+    // if( !Str::startsWith($sessionid, 'nvaa') ) {
+    //     $sessionid = 'nvaa'.$sessionid;
+    // }
     $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
 
     //$logs = $logs->groupBy('service');
