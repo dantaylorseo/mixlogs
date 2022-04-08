@@ -9,6 +9,10 @@
                             <tr>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Project
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <input class="shadow border-b border-gray-200 sm:rounded-lg px-3 py-1 text-left text-xs font-medium text-gray-500 min-w-full outline-none focus:outline-none" wire:model="sessionid" class="form-control" type="text" placeholder="Session ID">
                                 </th>
                                 <th scope="col"
@@ -44,6 +48,9 @@
                                 @else
                             <tr class="bg-gray-50">
                                 @endif
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $log->project ?? 'n/a' }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $log->sessionid }}
                                 </td>
