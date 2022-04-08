@@ -17,6 +17,18 @@
                                 </th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    NLU
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    DLG
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    C3
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Records
                                 </th>
                                 
@@ -37,6 +49,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ \Carbon\Carbon::parse($log->timestamp)->toDayDateTimeString() }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $log->nlu ?? 'n/a' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $log->dlg ?? 'n/a' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $log->c3 ?? 'n/a' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $log->logs_count }}

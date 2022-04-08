@@ -57,6 +57,9 @@ class ProcessLogs implements ShouldQueue
         $logArray = [];
         $count = 0;
         $lastLog = [];
+        $nlu = "n/a";
+        $dlg = "n/a";
+        $c3 = "n/a";
 
         foreach( $this->logs as $log ) {
             if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
@@ -79,6 +82,22 @@ class ProcessLogs implements ShouldQueue
                 'data' => !empty( $log['value']['data'] ) ? json_encode($log['value']['data']) : null,
             ];
                 
+            if( !empty( $log['value']['events'] ) && count( $log['value']['events'] ) > 0 && $log['value']['events'][0]['name'] == 'session-start' ) {
+                if( !empty( $log['value']['events'][0]['value']['version'] ) ) {
+                    $dlg = $log['value']['events'][0]['value']['version']['dlg'];
+                    $nlu = collect( $log['value']['events'][0]['value']['version']['nlu'] )->first();
+                    
+                }
+            }
+
+            if( !empty( $log['value']['events'] ) && count( $log['value']['events'] ) > 0 && $log['value']['events'][0]['name'] == 'data-required' ) {
+                if( !empty( $log['value']['events'][0]['value']['endpoint'] ) ) {
+                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['events'][0]['value']['endpoint'], $matches);
+                    if( count( $matches ) > 1 ) {
+                        $c3 = $matches[1];
+                    }
+                }
+            }
 
             
             // $this->application->offset = $log['offset'];
@@ -96,6 +115,9 @@ class ProcessLogs implements ShouldQueue
                     $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
                     $session->records = $session->records + $count;
                     $session->application_id = $this->application->id;
+                    $session->dlg = $dlg;
+                    $session->nlu = $nlu;
+                    $session->c3 = $c3;
                     if( !empty( $session->timestamp ) ) {
                         if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
                             $session->timestamp = $lastLog['timestamp'];
