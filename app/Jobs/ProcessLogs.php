@@ -82,17 +82,17 @@ class ProcessLogs implements ShouldQueue
                 'data' => !empty( $log['value']['data'] ) ? json_encode($log['value']['data']) : null,
             ];
                 
-            if( !empty( $log['value']['events'] ) && count( $log['value']['events'] ) > 0 && $log['value']['events'][0]['name'] == 'session-start' ) {
-                if( !empty( $log['value']['events'][0]['value']['version'] ) ) {
-                    $dlg = $log['value']['events'][0]['value']['version']['dlg'];
-                    $nlu = collect( $log['value']['events'][0]['value']['version']['nlu'] )->first();
+            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && $log['value']['data']['events'][0]['name'] == 'session-start' ) {
+                if( !empty( $log['value']['data']['events'][0]['value']['version'] ) ) {
+                    $dlg = $log['value']['data']['events'][0]['value']['version']['dlg'];
+                    $nlu = collect( $log['value']['data']['events'][0]['value']['version']['nlu'] )->first();
                     
                 }
             }
 
-            if( !empty( $log['value']['events'] ) && count( $log['value']['events'] ) > 0 && $log['value']['events'][0]['name'] == 'data-required' ) {
-                if( !empty( $log['value']['events'][0]['value']['endpoint'] ) ) {
-                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['events'][0]['value']['endpoint'], $matches);
+            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && $log['value']['data']['events'][0]['name'] == 'data-required' ) {
+                if( !empty( $log['value']['data']['events'][0]['value']['endpoint'] ) ) {
+                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['data']['events'][0]['value']['endpoint'], $matches);
                     if( count( $matches ) > 1 ) {
                         $c3 = $matches[1];
                     }
