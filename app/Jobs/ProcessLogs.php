@@ -119,9 +119,9 @@ class ProcessLogs implements ShouldQueue
                     $session->records = $session->records + $count;
                     $session->application_id = $this->application->id;
                     
-                    if( $session->dlg == 'n/a' && $dlg != 'n/a' ) $session->dlg = $dlg;
-                    if( $session->nlu == 'n/a' && $nlu != 'n/a' ) $session->nlu = $nlu;
-                    if( $session->project == 'n/a' && $project != 'n/a' ) $session->project = $project;
+                    if( empty( $session->dlg ) || ( $session->dlg == 'n/a' && $dlg != 'n/a' ) ) $session->dlg = $dlg;
+                    if( empty( $session->nlu ) || ( $session->nlu == 'n/a' && $nlu != 'n/a' ) ) $session->nlu = $nlu;
+                    if( empty( $session->project ) || ( $session->project == 'n/a' && $project != 'n/a' ) ) $session->project = $project;
 
                     if( !empty( $session->timestamp ) ) {
                         if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
