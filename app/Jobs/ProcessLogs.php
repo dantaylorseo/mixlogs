@@ -118,9 +118,11 @@ class ProcessLogs implements ShouldQueue
                     $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
                     $session->records = $session->records + $count;
                     $session->application_id = $this->application->id;
-                    $session->dlg = $dlg;
-                    $session->nlu = $nlu;
-                    $session->c3 = $c3;
+                    
+                    if( $session->dlg == 'n/a' && $dlg != 'n/a' ) $session->dlg = $dlg;
+                    if( $session->nlu == 'n/a' && $nlu != 'n/a' ) $session->nlu = $nlu;
+                    if( $session->project == 'n/a' && $project != 'n/a' ) $session->project = $project;
+                    
                     $session->project = $project;
                     if( !empty( $session->timestamp ) ) {
                         if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
