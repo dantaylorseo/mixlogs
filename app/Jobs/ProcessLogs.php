@@ -95,7 +95,7 @@ class ProcessLogs implements ShouldQueue
 
             if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && !empty( $log['value']['data']['events'][0]['name'] ) && $log['value']['data']['events'][0]['name'] == 'data-required' ) {
                 if( !empty( $log['value']['data']['events'][0]['value']['endpoint'] ) ) {
-                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['data']['events'][0]['value']['endpoint'], $matches);
+                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['data']['events'][0]['value']['endpoint']['uri'], $matches);
                     if( count( $matches ) > 1 ) {
                         $c3 = $matches[1];
                     }
