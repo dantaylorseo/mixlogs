@@ -121,6 +121,7 @@ class ProcessLogs implements ShouldQueue
                     
                     if( empty( $session->dlg ) || ( $session->dlg == 'n/a' && $dlg != 'n/a' ) ) $session->dlg = $dlg;
                     if( empty( $session->nlu ) || ( $session->nlu == 'n/a' && $nlu != 'n/a' ) ) $session->nlu = $nlu;
+                    if( empty( $session->c3 ) || ( $session->c3 == 'n/a' && $c3 != 'n/a' ) ) $session->c3 = $c3;
                     if( empty( $session->project ) || ( $session->project == 'n/a' && $project != 'n/a' ) ) $session->project = $project;
 
                     if( !empty( $session->timestamp ) ) {
