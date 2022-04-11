@@ -32,6 +32,8 @@
                     <x-data-required :event="$log->events[0]"></x-data-required>
                 @elseif( $log->logType == 'Data-received' )
                     <x-data-received :event="$log->events[0]"></x-data-received>
+                @elseif( $log->logType == 'DLGaaS-Execute-End' )
+                    <x-finalizer :request="$log->request" :response="$log->response"></x-finalizer>
                 @else 
                     <x-basic :logData="$log->data"></x-basic>
                 @endif
