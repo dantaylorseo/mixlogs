@@ -13,6 +13,10 @@
                                 </th>
                                 <th scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Project ID
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <input class="shadow border-b border-gray-200 sm:rounded-lg px-3 py-1 text-left text-xs font-medium text-gray-500 min-w-full outline-none focus:outline-none" wire:model="sessionid" class="form-control" type="text" placeholder="Session ID">
                                 </th>
                                 <th scope="col"
@@ -52,6 +56,9 @@
                                     {{ $log->project ?? 'n/a' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {{ $log->project_id ?? 'n/a' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $log->sessionid }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -69,9 +76,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $log->logs_count }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"> 
                                     <a target="_blank" href="{{ url('/log', $log->sessionid) }}" class="text-indigo-600 hover:text-indigo-900">View</a> | 
-                                    <a href="{{ url('/log/'. $log->sessionid.'/download') }}" class="text-indigo-600 hover:text-indigo-900">Download</a>
+                                    <a href="{{ url('/log/'. $log->sessionid.'/download') }}" class="text-indigo-600 hover:text-indigo-900">Download</a> |
+                                    <a target="_blank" href="{{ url('/log', $log->sessionid) }}/raw" class="text-indigo-600 hover:text-indigo-900">Raw</a>
                                 </td>
                             </tr>
                             @endforeach

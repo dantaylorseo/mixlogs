@@ -25,7 +25,17 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 
-Route::get('log/{sessionid}', function( $sessionid ) {
+Route::get('log/{sessionid}', function( Application $application, $sessionid ) {
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+
+    return view('log', [
+        'logs' => $logs,
+        'sessionid' => $sessionid,
+        'application' => $application
+    ]);
+});
+
+Route::get('log/{sessionid}/raw', function( $sessionid ) {
     // if( !Str::startsWith($sessionid, 'nvaa') ) {
     //     $sessionid = 'nvaa'.$sessionid;
     // }

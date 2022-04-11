@@ -61,6 +61,7 @@ class ProcessLogs implements ShouldQueue
         $dlg = "n/a";
         $c3 = "n/a";
         $project = "n/a";
+        $project_id = "n/a";
 
         foreach( $this->logs as $log ) {
             if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
@@ -88,6 +89,9 @@ class ProcessLogs implements ShouldQueue
                     $dlg = $log['value']['data']['events'][0]['value']['version']['dlg'];
                     if( !empty( $log['value']['data']['events'][0]['value']['project']['name'] ) ) {
                         $project = $log['value']['data']['events'][0]['value']['project']['name'];
+                    }
+                    if( !empty( $log['value']['data']['events'][0]['value']['project']['id'] ) ) {
+                        $project_id = $log['value']['data']['events'][0]['value']['project']['id'];
                     }
                     $nlu = collect( $log['value']['data']['events'][0]['value']['version']['nlu'] )->first(); 
                 }
@@ -123,6 +127,7 @@ class ProcessLogs implements ShouldQueue
                     if( empty( $session->nlu ) || ( $session->nlu == 'n/a' && $nlu != 'n/a' ) ) $session->nlu = $nlu;
                     if( empty( $session->c3 ) || ( $session->c3 == 'n/a' && $c3 != 'n/a' ) ) $session->c3 = $c3;
                     if( empty( $session->project ) || ( $session->project == 'n/a' && $project != 'n/a' ) ) $session->project = $project;
+                    if( empty( $session->project_id ) || ( $session->project_id == 'n/a' && $project_id != 'n/a' ) ) $session->project_id = $project_id;
 
                     if( !empty( $session->timestamp ) ) {
                         if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
