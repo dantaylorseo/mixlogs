@@ -21,7 +21,7 @@
                       </span>
                       {{ $log->logType }}
                     </h3>
-                  <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ $log->timestamp->toRfc822String() }}</p>
+                  <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ $log->timestamp->format('d/m/Y H:i:s.v') }}</p>
                   
                 </div>
                 @if( $log->logType == 'Transition' )
