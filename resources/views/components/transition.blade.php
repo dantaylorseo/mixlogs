@@ -15,7 +15,7 @@
           <span class="text-sm font-medium">
             {{ ucwords( $from->type ) }} <br>
             @if( !empty( $log->session ) && !empty( $log->session->project_id ) ) 
-              <a class="underline text-indigo-600" href="https://mix.nuance.{{ $log->application->tld }}/v3/dialog/{{ $log->session->project_id }}/design/nodes/{{ $from->uuid }}">{{ $from->uuid }}</a>
+              <a target="_blank" class="underline text-indigo-600" href="https://mix.nuance.{{ $log->application->tld }}/v3/dialog/{{ $log->session->project_id }}/design/nodes/{{ $from->uuid }}">{{ $from->uuid }}</a>
             @else
               {{ $from->uuid }}
             @endif
@@ -44,7 +44,7 @@
           <span class="text-sm font-medium">
             {{ ucwords( $to->type ) }} <br>
             @if( !empty( $log->session ) && !empty( $log->session->project_id ) ) 
-              <a class="underline text-indigo-600" href="https://mix.nuance.{{ $log->application->tld }}/v3/dialog/{{ $log->session->project_id }}/design/nodes/{{ $to->uuid }}">{{ $to->uuid }}</a>
+              <a target="_blank" class="underline text-indigo-600" href="https://mix.nuance.{{ $log->application->tld }}/v3/dialog/{{ $log->session->project_id }}/design/nodes/{{ $to->uuid }}">{{ $to->uuid }}</a>
             @else
               {{ $to->uuid }}
             @endif
