@@ -26,7 +26,7 @@ Route::get('/dashboard', function () {
 
 
 Route::get('log/{sessionid}', function( Application $application, $sessionid ) {
-    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->get();
 
     return view('log', [
         'logs' => $logs,
@@ -39,7 +39,7 @@ Route::get('log/{sessionid}/raw', function( $sessionid ) {
     // if( !Str::startsWith($sessionid, 'nvaa') ) {
     //     $sessionid = 'nvaa'.$sessionid;
     // }
-    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->get();
 
     //$logs = $logs->groupBy('service');
 
@@ -68,7 +68,7 @@ Route::get('log/{sessionid}/download', function( $sessionid ) {
     if( !Str::startsWith($sessionid, 'nvaa') ) {
         $sessionid = 'nvaa'.$sessionid;
     }
-    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->orderBy('seqid')->get();
+    $logs = Log::where('sessionid', $sessionid)->orderBy('timestamp')->get();
 
     $logs = $logs->groupBy('service');
 
