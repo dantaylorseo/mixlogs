@@ -4,7 +4,7 @@
 
     <li class="relative md:flex-1 md:flex">
       <!-- Current Step -->
-      <a href="#" class="px-6 py-4 flex items-center text-sm font-medium" aria-current="step">
+      <span class="px-6 py-4 flex items-center text-sm font-medium" aria-current="step">
         <span class="flex-shrink-0 w-10 h-10 flex items-center justify-center border-2 border-indigo-600 rounded-full">
           <span class="text-indigo-600">From</span>
         </span>
@@ -21,7 +21,7 @@
             @endif
           </span>
         </span>
-      </a>
+      </span>
 
       <!-- Arrow separator for lg screens and up -->
       <div class="hidden md:block absolute top-0 right-0 h-full w-5" aria-hidden="true">
