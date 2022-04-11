@@ -70,7 +70,7 @@ class ProcessLogs implements ShouldQueue
                 'application_id' => $this->application->id,
                 'service' => $log['value']['service'],
                 'source' => $log['value']['source'],
-                'timestamp' => $log['value']['timestamp'],
+                'timestamp' => Carbon::parse($log['value']['timestamp'])->format('Y-m-d H:i:s:u'),
                 'appid' => $log['value']['appid'],
                 'traceid' => $log['value']['data']['traceid'],
                 'requestid' => $log['value']['data']['requestid'],
