@@ -52,15 +52,21 @@
                         </div>
                         @if( !empty( $response->payload->messages) )
                             @foreach( $response->payload->messages as $message )
-                                <div class="mt-2 text-sm text-gray-700 bg-gray-100 py-3 px-5 rounded-full inline-block">
-                                {{ !empty( $message->visual[0]->text) ? $message->visual[0]->text : '(blank)' }}
-                                </div>
+                                @if( !empty( $message->visual[0]->text) )
+                                    <div>
+                                        <div class="mt-2 text-sm text-gray-700 bg-gray-100 py-3 px-5 rounded-full inline-block">
+                                            {{ !empty( $message->visual[0]->text) ? $message->visual[0]->text : '(blank)' }}
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         @endif
                         @if( !empty( $response->payload->qaAction) && !empty( $response->payload->qaAction->message->visual ) )
+                        <div>
                             <div class="mt-2 text-sm text-gray-700 bg-gray-100 py-3 px-5 rounded-full inline-block">
                                 {{ !empty( $response->payload->qaAction->message->visual[0]->text ) ? $response->payload->qaAction->message->visual[0]->text : '(blank)' }}
                             </div>
+                        </div>
                         @endif
                     </div>
                 </div>
