@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use Spatie\ShortSchedule\ShortSchedule;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -25,7 +26,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('testcommand')->everyMinute();
+        // $schedule->command('testcommand')->everyMinute();
+    }
+
+    protected function shortSchedule(ShortSchedule $shortSchedule)
+    {
+        $shortSchedule->command('testcommand')->everySeconds(15);
     }
 
     /**
