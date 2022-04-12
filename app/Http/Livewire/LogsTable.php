@@ -32,7 +32,7 @@ class LogsTable extends Component
         if( !empty( $this->sessionid ) ) {
             $logs = $logs->where('sessionid', 'LIKE', '%'.$this->sessionid.'%');
         }
-        $logs = $logs->orderByDesc('timestamp')->withCount('logs')->paginate(10);
+        $logs = $logs->orderByDesc('timestamp')->withCount('logs')->paginate(30);
         
         return view('livewire.logs-table', ['logs' => $logs]);
     }
