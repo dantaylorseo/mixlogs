@@ -38,13 +38,16 @@ class MakeApp extends Command
      */
     public function handle()
     {
-        Application::create([
-            'name' => 'ASOS UK Dev',
-            'client_id' => 'appID:ASOS-VA-Sandbox:geo:eu:clientName:dan_logging_dev',
-            'client_secret' => 'V4HZ68ihBd1p5-JTJIu0BaXjcUWIpxEfXOrQgl9QUyk',
+        $app = Application::create([
+            'name' => 'UK Prod',
+            'client_id' => 'appID:ASOS-VA-Production:geo:eu:clientName:nvaa-uk-store-va',
+            'client_secret' => 'n0ukjR14gzIK_CQxIcAfIVxsu3vilziupGlym-xbV-E',
             'date_retention' => 30,
             'tld' => 'eu'
         ]);
+
+        $app->users()->attach([1]);
+
         return Command::SUCCESS;
     }
 }
