@@ -21,7 +21,7 @@ class MixLogService {
     private $offset_reset = "latest";
     private $timeout = 15000;
     private $min_bytes = -1;
-    private $auto_commit = false;
+    private $auto_commit = true;
 
     private $auth_url = "https://auth.crt.nuance.%s/oauth2/token";
     private $base_url = "https://log.api.nuance.%s";
@@ -274,7 +274,7 @@ class MixLogService {
         Logger::info( "(".$this->application->name.") - Running... $loop " );
         $last = $this->application->offset;
         if( !empty( $last ) ) {
-            $this->_commitOffset( $last );
+            // $this->_commitOffset( $last );
             Logger::info( "(".$this->application->name.") - Committed Offset" );
         } else {
             Logger::info( "(".$this->application->name.") - NO Offset" );
