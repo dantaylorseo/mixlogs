@@ -22,12 +22,12 @@ class LogsTable extends Component
     public function render()
     {
         $logs = Session::where('application_id', $this->application->id);
-        if( !empty( $this->textSearch ) ) {
-            $logs = $logs->whereHas('logs', function($query) {
-                $query->whereRaw("MATCH(`logs`.`data`) AGAINST(\"'$this->textSearch'\" IN BOOLEAN MODE)");
-            });
-            //dd( $logs->toSql() );
-        } 
+        // if( !empty( $this->textSearch ) ) {
+        //     $logs = $logs->whereHas('logs', function($query) {
+        //         $query->whereRaw("MATCH(`logs`.`data`) AGAINST(\"'$this->textSearch'\" IN BOOLEAN MODE)");
+        //     });
+        //     //dd( $logs->toSql() );
+        // } 
         
         if( !empty( $this->sessionid ) ) {
             $logs = $logs->where('sessionid', 'LIKE', '%'.$this->sessionid.'%');
