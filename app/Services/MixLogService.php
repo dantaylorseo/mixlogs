@@ -495,7 +495,8 @@ class MixLogService {
         $this->_authenticate();
         $this->_delete_consumer();
         $this->_create_consumer();
-        $this->_assignPartitions();
+        // $this->_assignPartitions();
+        $this->_subscribe();
         if( !empty( $commitOffset ) )  $this->_commitOffset($commitOffset);
         //$this->resetOffset();
         return $this;
