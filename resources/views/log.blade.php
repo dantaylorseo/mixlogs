@@ -24,7 +24,7 @@
                   <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ $log->timestamp->format('d/m/Y H:i:s.v') }}</p>
                   
                 </div>
-                @if( $log->logType == 'Transition' )
+                @if( $log->logType == 'Transition' ) 
                     <x-transition :log="$log" :from="$log->events[0]->value->from" :to="$log->events[0]->value->to"></x-transition>
                 @elseif( $log->logType == 'Message' )
                     <x-message :message="!empty( $log->events[0]->value->visual[0] ) ? $log->events[0]->value->visual[0]->text : '(Blank)'"></x-message>
