@@ -79,23 +79,27 @@ class MixLogService {
      */
     private function _create_consumer() {
 
-        $body = [
-            "auto.offset.reset" => $this->offset_reset,
-            "consumer.request.timeout.ms" => $this->timeout,
-            "fetch.min.bytes" => $this->min_bytes,
-            "auto.commit.enable" => $this->auto_commit
-        ];
+        try {
+                $body = [
+                "auto.offset.reset" => $this->offset_reset,
+                "consumer.request.timeout.ms" => $this->timeout,
+                "fetch.min.bytes" => $this->min_bytes,
+                "auto.commit.enable" => $this->auto_commit
+            ];
 
-        
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers', $body);
+            
+            $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers', $body);
 
-        if( !$response->successful() && $response->status() != 409 ) {
-            dump( $response->json() );
+            if( !$response->successful() && $response->status() != 409 ) {
+                dump( $response->json() );
+                $response->close();
+                throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
+            }
+
             $response->close();
-            throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
+        } catch( \Exception $e ) {
+            info('Error creating consumer: '. $e->getMessage());
         }
-
-        $response->close();
         return;
     }
 
@@ -493,7 +497,7 @@ class MixLogService {
         $this->application = $application;
         $this->_generate_consumer_group_name();
         $this->_authenticate();
-        $this->_delete_consumer();
+        // $this->_delete_consumer();
         $this->_create_consumer();
         // $this->_assignPartitions();
         $this->_subscribe();
