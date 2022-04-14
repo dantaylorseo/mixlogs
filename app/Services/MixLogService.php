@@ -300,7 +300,8 @@ class MixLogService {
                 [
                     'application' => $this->application->name,
                     'status' => $response->status(),
-                    'headers' => $this->_getHeaders()
+                    'headers' => $this->_getHeaders(),
+                    'error' => $response->body()
                 ]
             );
             $this->_delete_consumer();
