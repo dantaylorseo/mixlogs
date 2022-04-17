@@ -64,7 +64,7 @@ class ProcessLogs implements ShouldQueue
         $project_id = "n/a";
 
         foreach( $this->logs as $log ) {
-            if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
+            // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
             $logArray[] = [
                 'id' => $log['key']['id'],
                 'application_id' => $this->application->id,
