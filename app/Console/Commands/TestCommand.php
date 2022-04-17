@@ -43,7 +43,6 @@ class TestCommand extends Command
     {
         foreach(Application::all() as $application) {
             //MixLogService::setApplication($application)->getRecords();
-            info("Adding job to queue");
             dispatch( new LogJob( $application ) )->onQueue('apps');
         }
         return Command::SUCCESS;
