@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('testcommand')->everyMinute();
         $schedule->command('cleanup')->dailyAt('00:00');
+        
     }
 
     protected function shortSchedule(ShortSchedule $shortSchedule)
