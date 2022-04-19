@@ -41,10 +41,10 @@ class LogJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
-        Log::info("Added ".$this->application->name." to queue");
+        Log::info("Added " . $this->application->name . " to queue");
         MixLogService::setApplication($this->application)->getRecords();
     }
-    
+
     /**
      * The job failed to process.
      *
@@ -53,8 +53,15 @@ class LogJob implements ShouldQueue, ShouldBeUnique
      */
     public function failed(Exception $exception)
     {
-        Log::error("LogJob failed for Application: ".$this->application->name.". Error: ".$exception->getMessage() );
+        Log::error("LogJob failed for Application: " . $this->application->name . ". Error: " . $exception->getMessage());
     }
+
+    /**
+     * The number of seconds after which the job's unique lock will be released.
+     *
+     * @var int
+     */
+    public $uniqueFor = 60 * 5;
 
     public function uniqueId()
     {
