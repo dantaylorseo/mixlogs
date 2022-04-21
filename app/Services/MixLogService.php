@@ -436,6 +436,7 @@ class MixLogService
             DB::table('logs')->upsert($logArray, 'id');
             $count = count($logArray);
             $lastLog = end($logArray);
+            info("Inserted " . $count . " logs");
             if (!empty($lastLog['sessionid'])) {
                 info("Session ID: " . $lastLog['sessionid']);
 
