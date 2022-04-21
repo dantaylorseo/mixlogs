@@ -380,7 +380,7 @@ class MixLogService
         $project = "n/a";
         $project_id = "n/a";
 
-        info("Processing " . count($logs) . " logs");
+        // info("Processing " . count($logs) . " logs");
 
         foreach ($logs as $log) {
             // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
@@ -431,7 +431,7 @@ class MixLogService
 
         }
 
-        info("Found " . count($logArray) . " logs, inserting");
+        // info("Found " . count($logArray) . " logs, inserting");
         try {
             $chunks = array_chunk($logArray, 10);
             // foreach ($chunks as $chunk) {
@@ -443,9 +443,9 @@ class MixLogService
             
             $count = count($logArray);
             $lastLog = end($logArray);
-            info("Inserted " . $count . " logs");
+            // info("Inserted " . $count . " logs");
             if (!empty($lastLog['sessionid'])) {
-                info("Session ID: " . $lastLog['sessionid']);
+                // info("Session ID: " . $lastLog['sessionid']);
 
                 $session = Session::firstOrNew(['sessionid' => $lastLog['sessionid']]);
                 $session->records = $session->records + $count;
