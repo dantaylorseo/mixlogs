@@ -420,7 +420,7 @@ class MixLogService {
             $count = count( $logArray );
             $lastLog = end( $logArray );
             if( !empty( $lastLog['sessionid'] ) ) {
-                // info( "Session ID: " . $lastLog['sessionid'] );
+                info( "Session ID: " . $lastLog['sessionid'] );
                 try {
                     $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
                     $session->records = $session->records + $count;
