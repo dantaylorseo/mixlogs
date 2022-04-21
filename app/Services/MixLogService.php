@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Log;
+use App\Models\Session;
+use App\Jobs\ProcessLogs;
 use App\Models\Application;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Exceptions\MixLogException;
 use Illuminate\Support\Facades\Http;
-use App\Exceptions\MixLogAuthenticationException;
-use App\Jobs\ProcessLogs;
-use App\Models\Session;
 use Illuminate\Support\Facades\Log as Logger;
-
+use App\Exceptions\MixLogAuthenticationException;
+use Illuminate\Support\Facades\Log as FacadesLog;
 class MixLogService {
 
     private $access_token = null;
@@ -310,7 +312,8 @@ class MixLogService {
 
             info("Adding ".$logChunks->count()." sessions");
             foreach( $logChunks as $chunk ) {
-                dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');   
+                // dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');   
+                $this->processLogs( $chunk->all() );
             }
 
             $last = end( $logs );
@@ -349,6 +352,107 @@ class MixLogService {
             );
             $response->close();
         }
+    }
+
+    private function processLogs($logs) {
+
+        $logArray = [];
+        $count = 0;
+        $lastLog = [];
+        $nlu = "n/a";
+        $dlg = "n/a";
+        $c3 = "n/a";
+        $project = "n/a";
+        $project_id = "n/a";
+
+        foreach( $logs as $log ) {
+            // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
+            $logArray[] = [
+                'id' => $log['key']['id'],
+                'application_id' => $this->application->id,
+                'service' => $log['value']['service'],
+                'source' => $log['value']['source'],
+                'timestamp' => Carbon::parse($log['value']['timestamp'])->setTimezone('Europe/London')->format('Y-m-d H:i:s.v'),
+                'appid' => $log['value']['appid'],
+                'traceid' => $log['value']['data']['traceid'],
+                'requestid' => $log['value']['data']['requestid'],
+                'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
+                'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
+                'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
+                'offset' => $log['offset'],
+                'events' => !empty( $log['value']['data']['events'] ) ? json_encode($log['value']['data']['events']) : null,
+                'request' => !empty( $log['value']['data']['request'] ) ? json_encode($log['value']['data']['request']) : null,
+                'response' => !empty( $log['value']['data']['response'] ) ? json_encode($log['value']['data']['response']) : null,
+                'data' => !empty( $log['value']['data'] ) ? json_encode($log['value']['data']) : null,
+            ];
+                
+            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && !empty( $log['value']['data']['events'][0]['name'] ) && $log['value']['data']['events'][0]['name'] == 'session-start' ) {
+                if( !empty( $log['value']['data']['events'][0]['value']['version'] ) ) {
+                    $dlg = $log['value']['data']['events'][0]['value']['version']['dlg'];
+                    if( !empty( $log['value']['data']['events'][0]['value']['project']['name'] ) ) {
+                        $project = $log['value']['data']['events'][0]['value']['project']['name'];
+                    }
+                    if( !empty( $log['value']['data']['events'][0]['value']['project']['id'] ) ) {
+                        $project_id = $log['value']['data']['events'][0]['value']['project']['id'];
+                    }
+                    $nlu = collect( $log['value']['data']['events'][0]['value']['version']['nlu'] )->first(); 
+                }
+            }
+
+            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && !empty( $log['value']['data']['events'][0]['name'] ) && $log['value']['data']['events'][0]['name'] == 'data-required' ) {
+                if( !empty( $log['value']['data']['events'][0]['value']['endpoint'] ) ) {
+                    preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['data']['events'][0]['value']['endpoint']['uri'], $matches);
+                    if( count( $matches ) > 1 ) {
+                        $c3 = $matches[1];
+                    }
+                }
+            }
+
+            
+            // $this->application->offset = $log['offset'];
+            // $this->application->save();
+
+            
+            
+        }
+
+            DB::table('logs')->upsert( $logArray, 'id' );
+            $count = count( $logArray );
+            $lastLog = end( $logArray );
+            if( !empty( $lastLog['sessionid'] ) ) {
+                // info( "Session ID: " . $lastLog['sessionid'] );
+                try {
+                    $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
+                    $session->records = $session->records + $count;
+                    $session->application_id = $this->application->id;
+                    
+                    if( empty( $session->dlg ) || ( $session->dlg == 'n/a' && $dlg != 'n/a' ) ) $session->dlg = $dlg;
+                    if( empty( $session->nlu ) || ( $session->nlu == 'n/a' && $nlu != 'n/a' ) ) $session->nlu = $nlu;
+                    if( empty( $session->c3 ) || ( $session->c3 == 'n/a' && $c3 != 'n/a' ) ) $session->c3 = $c3;
+                    if( empty( $session->project ) || ( $session->project == 'n/a' && $project != 'n/a' ) ) $session->project = $project;
+                    if( empty( $session->project_id ) || ( $session->project_id == 'n/a' && $project_id != 'n/a' ) ) $session->project_id = $project_id;
+
+                    if( !empty( $session->timestamp ) ) {
+                        if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
+                            $session->timestamp = $lastLog['timestamp'];
+                        }
+                    } else {
+                        $session->timestamp = $lastLog['timestamp'];
+                    }
+                    $session->save();
+                } catch( Exception $e ) {
+                    dump( "catch" );
+                    dump($e->getMessage());
+                    FacadesLog::error($e->getMessage());
+                }
+            } else {
+                dump( "not found" );
+            }
+
+        // } catch( Exception $e ) {
+        //     dump( $e );
+        // }
+
     }
 
     private function _getHeaders() {
