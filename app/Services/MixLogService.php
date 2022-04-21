@@ -435,6 +435,7 @@ class MixLogService
         try {
             $chunks = array_chunk($logArray, 10);
             foreach ($chunks as $chunk) {
+                info("Inserting chunk " . count($chunk));
                 DB::table('logs')->upsert($chunk, 'id');
                 info("Inserted " . count($chunk) . " logs");
             }
