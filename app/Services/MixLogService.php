@@ -464,6 +464,7 @@ class MixLogService
                 } else {
                     $session->timestamp = $lastLog['timestamp'];
                 }
+                $session->offset = $lastLog['offset'];
                 $session->save();
             } else {
                 dump("not found");
