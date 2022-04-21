@@ -380,6 +380,8 @@ class MixLogService
         $project = "n/a";
         $project_id = "n/a";
 
+        info("Processing " . count($logs) . " logs");
+
         foreach ($logs as $log) {
             // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
             $logArray[] = [
@@ -427,9 +429,9 @@ class MixLogService
             // $this->application->offset = $log['offset'];
             // $this->application->save();
 
-
-
         }
+
+        info("Found " . count($logArray) . " logs, inserting");
         try {
             DB::table('logs')->upsert($logArray, 'id');
             $count = count($logArray);
