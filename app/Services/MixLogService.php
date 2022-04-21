@@ -15,11 +15,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log as Logger;
 use App\Exceptions\MixLogAuthenticationException;
 use Illuminate\Support\Facades\Log as FacadesLog;
-class MixLogService {
+
+class MixLogService
+{
 
     private $access_token = null;
     private $consumer_group = null;
-    
+
     private $offset_reset = "latest";
     private $timeout = 15000;
     private $min_bytes = -1;
@@ -35,26 +37,27 @@ class MixLogService {
      *
      * @return void
      */
-    private function _authenticate() {
-        if( empty( $this->application ) ) {
+    private function _authenticate()
+    {
+        if (empty($this->application)) {
             throw new MixLogAuthenticationException("Application not set. Use setApplication()");
         }
 
         $auth_url = sprintf($this->auth_url, $this->application->tld);
 
-        $response = Http::withBasicAuth( urlencode( $this->application->client_id ), $this->application->client_secret )->asForm()->post($auth_url, [
+        $response = Http::withBasicAuth(urlencode($this->application->client_id), $this->application->client_secret)->asForm()->post($auth_url, [
             'grant_type' => 'client_credentials',
             'scope' => 'log'
         ]);
 
-        if( !$response->successful() ) {
+        if (!$response->successful()) {
             $response->close();
-            throw new MixLogAuthenticationException("Authentication error", $response->status() );
+            throw new MixLogAuthenticationException("Authentication error", $response->status());
         }
 
         $json = $response->json();
 
-        if( !empty( $json['access_token'] ) ) {
+        if (!empty($json['access_token'])) {
             $this->access_token = $json['access_token'];
         }
 
@@ -62,11 +65,12 @@ class MixLogService {
         return;
     }
 
-    private function _generate_consumer_group_name() {
-        $clientIdParts = explode( ':', $this->application->client_id );
+    private function _generate_consumer_group_name()
+    {
+        $clientIdParts = explode(':', $this->application->client_id);
 
         $groupName = sprintf(
-            "appID-%s-clientName-%s-04", 
+            "appID-%s-clientName-%s-04",
             $clientIdParts[1],
             $clientIdParts[5]
         );
@@ -79,28 +83,29 @@ class MixLogService {
      *
      * @return void
      */
-    private function _create_consumer() {
+    private function _create_consumer()
+    {
 
         try {
-                $body = [
+            $body = [
                 "auto.offset.reset" => $this->offset_reset,
                 "consumer.request.timeout.ms" => $this->timeout,
                 "fetch.min.bytes" => $this->min_bytes,
                 "auto.commit.enable" => $this->auto_commit
             ];
 
-            
-            $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers', $body);
 
-            if( !$response->successful() && $response->status() != 409 ) {
-                dump( $response->json() );
+            $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers', $body);
+
+            if (!$response->successful() && $response->status() != 409) {
+                dump($response->json());
                 $response->close();
-                throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
+                throw new MixLogException($response->status() . ": Error creating consumer", $response->status());
             }
 
             $response->close();
-        } catch( \Exception $e ) {
-            info('Error creating consumer: '. $e->getMessage());
+        } catch (\Exception $e) {
+            info('Error creating consumer: ' . $e->getMessage());
         }
         return;
     }
@@ -110,18 +115,18 @@ class MixLogService {
      *
      * @return void
      */
-    private function _delete_consumer() {
-        $response = Http::withHeaders($this->_getHeaders())->delete($this->_getBaseUrl().'/consumers');
+    private function _delete_consumer()
+    {
+        $response = Http::withHeaders($this->_getHeaders())->delete($this->_getBaseUrl() . '/consumers');
 
         //dump( $this->_getHeaders() );
-        if( !$response->successful() ) {
+        if (!$response->successful()) {
             //dump( $response->body() );
             //throw new MixLogException($response->status(). ": Error deleting consumer", $response->status() );
             $response->close();
             try {
-                Logger::error($response->status(). ": Error deleting consumer", ['body' => $response->body() || 'n/a' ]);
-            } catch( \Exception $e) {
-
+                Logger::error($response->status() . ": Error deleting consumer", ['body' => $response->body() || 'n/a']);
+            } catch (\Exception $e) {
             }
             return false;
         }
@@ -135,8 +140,9 @@ class MixLogService {
      *
      * @return void
      */
-    private function _subscribe() {
-        $clientIdParts = explode( ':', $this->application->client_id );
+    private function _subscribe()
+    {
+        $clientIdParts = explode(':', $this->application->client_id);
 
         $body = [
             "topics" => [
@@ -144,21 +150,22 @@ class MixLogService {
             ]
         ];
 
-        
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers/subscription', $body);
 
-        if( !$response->successful() ) {
-            dump( $response->body() );
+        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/subscription', $body);
+
+        if (!$response->successful()) {
+            dump($response->body());
             $response->close();
-            throw new MixLogException($response->status(). ": Error creating consumer", $response->status() );
+            throw new MixLogException($response->status() . ": Error creating consumer", $response->status());
         }
 
         $response->close();
     }
 
-    private function _assignPartitions() {
-        $clientIdParts = explode( ':', $this->application->client_id );
-        
+    private function _assignPartitions()
+    {
+        $clientIdParts = explode(':', $this->application->client_id);
+
         $body = [
             "partitions" => [
                 [
@@ -168,78 +175,81 @@ class MixLogService {
             ]
         ];
 
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers/assignments', $body);
+        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/assignments', $body);
 
-        if( !$response->successful() ) {
-            dump( $response->body() );
+        if (!$response->successful()) {
+            dump($response->body());
             $response->close();
-            throw new MixLogException($response->status(). ": Error assigning parititions", $response->status() );
-        }
-
-        $response->close();
-        return $this;
-
-    }
-
-    private function _getEarliestOffset() {
-        $clientIdParts = explode( ':', $this->application->client_id );
-        
-        $body = [
-            "partitions" => [
-                [
-                    "topic" => $clientIdParts[1],
-                    "partition" => 0,
-                ]
-            ]
-        ];
-
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers/committed/offsets', $body);
-
-        if( !$response->successful() ) {
-            dump( $response->body() );
-            $response->close();
-            throw new MixLogException($response->status(). ": Error getting offset", $response->status() );
-        }
-
-        dump( $response->json() );
-        $response->close();
-    }
-
-    public function resetOffset() {
-
-        $clientIdParts = explode( ':', $this->application->client_id );
-        
-        $body = [
-            "partitions" => [
-                [
-                    "topic" => $clientIdParts[1],
-                    "partition" => 0,
-                ]
-            ]
-        ];
-
-        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl().'/consumers/positions/beginning', $body);
-
-        if( !$response->successful() ) {
-            dump( $response->body() );
-            $response->close();
-            throw new MixLogException($response->status(). ": Error resetting offset", $response->status() );
+            throw new MixLogException($response->status() . ": Error assigning parititions", $response->status());
         }
 
         $response->close();
         return $this;
     }
 
-    public function commitOffset($offset) {
-        return $this->_commitOffset( $offset );
+    private function _getEarliestOffset()
+    {
+        $clientIdParts = explode(':', $this->application->client_id);
+
+        $body = [
+            "partitions" => [
+                [
+                    "topic" => $clientIdParts[1],
+                    "partition" => 0,
+                ]
+            ]
+        ];
+
+        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/committed/offsets', $body);
+
+        if (!$response->successful()) {
+            dump($response->body());
+            $response->close();
+            throw new MixLogException($response->status() . ": Error getting offset", $response->status());
+        }
+
+        dump($response->json());
+        $response->close();
     }
-    
-    private function _commitOffset( $offset ) {
 
-        Logger::info( "(".$this->application->name.") - Committing Offset: ".$offset );
+    public function resetOffset()
+    {
 
-        $clientIdParts = explode( ':', $this->application->client_id );
-        
+        $clientIdParts = explode(':', $this->application->client_id);
+
+        $body = [
+            "partitions" => [
+                [
+                    "topic" => $clientIdParts[1],
+                    "partition" => 0,
+                ]
+            ]
+        ];
+
+        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/positions/beginning', $body);
+
+        if (!$response->successful()) {
+            dump($response->body());
+            $response->close();
+            throw new MixLogException($response->status() . ": Error resetting offset", $response->status());
+        }
+
+        $response->close();
+        return $this;
+    }
+
+    public function commitOffset($offset)
+    {
+        return $this->_commitOffset($offset);
+    }
+
+    private function _commitOffset($offset)
+    {
+
+        Logger::info("(" . $this->application->name . ") - Committing Offset: " . $offset);
+
+        $clientIdParts = explode(':', $this->application->client_id);
+
         $body = [
             "offsets" => [
                 [
@@ -250,16 +260,16 @@ class MixLogService {
             ]
         ];
 
-        $response = Http::withHeaders($this->_getHeaders())->timeout(5)->post($this->_getBaseUrl().'/consumers/offsets', $body);
+        $response = Http::withHeaders($this->_getHeaders())->timeout(5)->post($this->_getBaseUrl() . '/consumers/offsets', $body);
 
-        if( !$response->successful() ) {
-            Logger::info( $response->body() );
+        if (!$response->successful()) {
+            Logger::info($response->body());
             $response->close();
             // throw new MixLogException($response->status(). ": Error committing offset", $response->status() );
             return false;
         }
         $response->close();
-        
+
         return $this;
     }
 
@@ -268,9 +278,10 @@ class MixLogService {
      *
      * @return void
      */
-    public function getRecords( $loop = 1, $total = 0 ) {
+    public function getRecords($loop = 1, $total = 0)
+    {
 
-        Logger::info( "(".$this->application->name.") - Running... $loop " );
+        Logger::info("(" . $this->application->name . ") - Running... $loop ");
         $last = $this->application->offset;
         // if( !empty( $last ) ) {
         //     // $this->_commitOffset( $last );
@@ -279,12 +290,13 @@ class MixLogService {
         //     Logger::info( "(".$this->application->name.") - NO Offset" );
         // } 
 
-        $response = Http::withHeaders($this->_getHeaders())->timeout(30)->get($this->_getBaseUrl().'/consumers/records');
+        $response = Http::withHeaders($this->_getHeaders())->timeout(30)->get($this->_getBaseUrl() . '/consumers/records');
 
-        if( !$response->successful() ) {
+        if (!$response->successful()) {
             $response->close();
             //throw new MixLogException($response->status(). ": Error getting records", $response->status() );
-            Logger::error("(".$this->application->name.") - Error getting records",
+            Logger::error(
+                "(" . $this->application->name . ") - Error getting records",
                 [
                     'application' => $this->application->name,
                     'status' => $response->status(),
@@ -295,57 +307,59 @@ class MixLogService {
             return;
         }
 
-        if( !empty( $response->json() ) ) {
+        if (!empty($response->json())) {
             $logs = $response->json();
-            Logger::info("(".$this->application->name.") - Fetched Rows", 
+            Logger::info(
+                "(" . $this->application->name . ") - Fetched Rows",
                 [
                     'application' => $this->application->name,
-                    'fetched' => count( $response->json() )
+                    'fetched' => count($response->json())
                 ]
             );
 
             $offset = 0;
 
-            $logChunks = collect($logs)->groupBy(function($item, $key) {
-                return !empty( $item['value']['data']['sessionid'] ) ? $item['value']['data']['sessionid'] : (!empty($item['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $item['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : "n/a" );
+            $logChunks = collect($logs)->groupBy(function ($item, $key) {
+                return !empty($item['value']['data']['sessionid']) ? $item['value']['data']['sessionid'] : (!empty($item['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $item['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : "n/a");
             });
 
-            info("Adding ".$logChunks->count()." sessions");
-            foreach( $logChunks as $chunk ) {
+            info("Adding " . $logChunks->count() . " sessions");
+            foreach ($logChunks as $chunk) {
                 // dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');   
-                $this->processLogs( $chunk->all() );
+                $this->processLogs($chunk->all());
             }
 
-            $last = end( $logs );
+            $last = end($logs);
             $this->application->offset = $last['offset'];
             $this->application->save();
-
         }
-                try{
-            if( !empty( $response->json() ) ) {
-                $total = $total + count( $response->json() );
-                
-                Logger::info("(".$this->application->name.") - Got new rows", 
+        try {
+            if (!empty($response->json())) {
+                $total = $total + count($response->json());
+
+                Logger::info(
+                    "(" . $this->application->name . ") - Got new rows",
                     [
                         'application' => $this->application->name,
-                        'added' => count( $response->json() ),
+                        'added' => count($response->json()),
                         'total' => $total,
                     ]
                 );
                 $response->close();
-               
             } else {
-                
-                Logger::info("(".$this->application->name.") - No new rows", 
+
+                Logger::info(
+                    "(" . $this->application->name . ") - No new rows",
                     [
                         'application' => $this->application->name,
                     ]
                 );
                 $response->close();
             }
-        } catch( \RuntimeException $e ) {
-           
-            Logger::info("(".$this->application->name.") - No new rows (catch)", 
+        } catch (\RuntimeException $e) {
+
+            Logger::info(
+                "(" . $this->application->name . ") - No new rows (catch)",
                 [
                     'application' => $this->application->name,
                 ]
@@ -354,7 +368,8 @@ class MixLogService {
         }
     }
 
-    private function processLogs($logs) {
+    private function processLogs($logs)
+    {
 
         $logArray = [];
         $count = 0;
@@ -365,7 +380,7 @@ class MixLogService {
         $project = "n/a";
         $project_id = "n/a";
 
-        foreach( $logs as $log ) {
+        foreach ($logs as $log) {
             // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
             $logArray[] = [
                 'id' => $log['key']['id'],
@@ -376,78 +391,78 @@ class MixLogService {
                 'appid' => $log['value']['appid'],
                 'traceid' => $log['value']['data']['traceid'],
                 'requestid' => $log['value']['data']['requestid'],
-                'sessionid' => !empty( $log['value']['data']['sessionid'] ) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null ),
-                'locale' => (!empty( $log['value']['data']['locale'] ) ? $log['value']['data']['locale'] : null),
-                'seqid' => !empty( $log['value']['data']['seqid'] ) ? $log['value']['data']['seqid'] : (!empty( $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] ) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
+                'sessionid' => !empty($log['value']['data']['sessionid']) ? $log['value']['data']['sessionid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : null),
+                'locale' => (!empty($log['value']['data']['locale']) ? $log['value']['data']['locale'] : null),
+                'seqid' => !empty($log['value']['data']['seqid']) ? $log['value']['data']['seqid'] : (!empty($log['value']['data']['request']['clientData']['x-nuance-dialog-seqid']) ? $log['value']['data']['request']['clientData']['x-nuance-dialog-seqid'] : "0"),
                 'offset' => $log['offset'],
-                'events' => !empty( $log['value']['data']['events'] ) ? json_encode($log['value']['data']['events']) : null,
-                'request' => !empty( $log['value']['data']['request'] ) ? json_encode($log['value']['data']['request']) : null,
-                'response' => !empty( $log['value']['data']['response'] ) ? json_encode($log['value']['data']['response']) : null,
-                'data' => !empty( $log['value']['data'] ) ? json_encode($log['value']['data']) : null,
+                'events' => !empty($log['value']['data']['events']) ? json_encode($log['value']['data']['events']) : null,
+                'request' => !empty($log['value']['data']['request']) ? json_encode($log['value']['data']['request']) : null,
+                'response' => !empty($log['value']['data']['response']) ? json_encode($log['value']['data']['response']) : null,
+                'data' => !empty($log['value']['data']) ? json_encode($log['value']['data']) : null,
             ];
-                
-            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && !empty( $log['value']['data']['events'][0]['name'] ) && $log['value']['data']['events'][0]['name'] == 'session-start' ) {
-                if( !empty( $log['value']['data']['events'][0]['value']['version'] ) ) {
+
+            if (!empty($log['value']['data']['events']) && count($log['value']['data']['events']) > 0 && !empty($log['value']['data']['events'][0]['name']) && $log['value']['data']['events'][0]['name'] == 'session-start') {
+                if (!empty($log['value']['data']['events'][0]['value']['version'])) {
                     $dlg = $log['value']['data']['events'][0]['value']['version']['dlg'];
-                    if( !empty( $log['value']['data']['events'][0]['value']['project']['name'] ) ) {
+                    if (!empty($log['value']['data']['events'][0]['value']['project']['name'])) {
                         $project = $log['value']['data']['events'][0]['value']['project']['name'];
                     }
-                    if( !empty( $log['value']['data']['events'][0]['value']['project']['id'] ) ) {
+                    if (!empty($log['value']['data']['events'][0]['value']['project']['id'])) {
                         $project_id = $log['value']['data']['events'][0]['value']['project']['id'];
                     }
-                    $nlu = collect( $log['value']['data']['events'][0]['value']['version']['nlu'] )->first(); 
+                    $nlu = collect($log['value']['data']['events'][0]['value']['version']['nlu'])->first();
                 }
             }
 
-            if( !empty( $log['value']['data']['events'] ) && count( $log['value']['data']['events'] ) > 0 && !empty( $log['value']['data']['events'][0]['name'] ) && $log['value']['data']['events'][0]['name'] == 'data-required' ) {
-                if( !empty( $log['value']['data']['events'][0]['value']['endpoint'] ) ) {
+            if (!empty($log['value']['data']['events']) && count($log['value']['data']['events']) > 0 && !empty($log['value']['data']['events'][0]['name']) && $log['value']['data']['events'][0]['name'] == 'data-required') {
+                if (!empty($log['value']['data']['events'][0]['value']['endpoint'])) {
                     preg_match('/https:\/\/(?:[a-z0-9\\-\\.]+)digital.nod.nuance.com\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)\/(?:[a-z\\-]+)([0-9]+)/u', $log['value']['data']['events'][0]['value']['endpoint']['uri'], $matches);
-                    if( count( $matches ) > 1 ) {
+                    if (count($matches) > 1) {
                         $c3 = $matches[1];
                     }
                 }
             }
 
-            
+
             // $this->application->offset = $log['offset'];
             // $this->application->save();
 
-            
-            
+
+
         }
+        try {
+            DB::table('logs')->upsert($logArray, 'id');
+            $count = count($logArray);
+            $lastLog = end($logArray);
+            if (!empty($lastLog['sessionid'])) {
+                info("Session ID: " . $lastLog['sessionid']);
 
-            DB::table('logs')->upsert( $logArray, 'id' );
-            $count = count( $logArray );
-            $lastLog = end( $logArray );
-            if( !empty( $lastLog['sessionid'] ) ) {
-                info( "Session ID: " . $lastLog['sessionid'] );
-                try {
-                    $session = Session::firstOrNew([ 'sessionid' => $lastLog['sessionid'] ]);
-                    $session->records = $session->records + $count;
-                    $session->application_id = $this->application->id;
-                    
-                    if( empty( $session->dlg ) || ( $session->dlg == 'n/a' && $dlg != 'n/a' ) ) $session->dlg = $dlg;
-                    if( empty( $session->nlu ) || ( $session->nlu == 'n/a' && $nlu != 'n/a' ) ) $session->nlu = $nlu;
-                    if( empty( $session->c3 ) || ( $session->c3 == 'n/a' && $c3 != 'n/a' ) ) $session->c3 = $c3;
-                    if( empty( $session->project ) || ( $session->project == 'n/a' && $project != 'n/a' ) ) $session->project = $project;
-                    if( empty( $session->project_id ) || ( $session->project_id == 'n/a' && $project_id != 'n/a' ) ) $session->project_id = $project_id;
+                $session = Session::firstOrNew(['sessionid' => $lastLog['sessionid']]);
+                $session->records = $session->records + $count;
+                $session->application_id = $this->application->id;
 
-                    if( !empty( $session->timestamp ) ) {
-                        if( $session->timestamp->isAfter( $lastLog['timestamp'] ) ) {
-                            $session->timestamp = $lastLog['timestamp'];
-                        }
-                    } else {
+                if (empty($session->dlg) || ($session->dlg == 'n/a' && $dlg != 'n/a')) $session->dlg = $dlg;
+                if (empty($session->nlu) || ($session->nlu == 'n/a' && $nlu != 'n/a')) $session->nlu = $nlu;
+                if (empty($session->c3) || ($session->c3 == 'n/a' && $c3 != 'n/a')) $session->c3 = $c3;
+                if (empty($session->project) || ($session->project == 'n/a' && $project != 'n/a')) $session->project = $project;
+                if (empty($session->project_id) || ($session->project_id == 'n/a' && $project_id != 'n/a')) $session->project_id = $project_id;
+
+                if (!empty($session->timestamp)) {
+                    if ($session->timestamp->isAfter($lastLog['timestamp'])) {
                         $session->timestamp = $lastLog['timestamp'];
                     }
-                    $session->save();
-                } catch( Exception $e ) {
-                    dump( "catch" );
-                    dump($e->getMessage());
-                    FacadesLog::error($e->getMessage());
+                } else {
+                    $session->timestamp = $lastLog['timestamp'];
                 }
+                $session->save();
             } else {
-                dump( "not found" );
+                dump("not found");
             }
+        } catch (Exception $e) {
+            dump("catch");
+            dump($e->getMessage());
+            FacadesLog::error($e->getMessage());
+        }
 
         // } catch( Exception $e ) {
         //     dump( $e );
@@ -455,7 +470,8 @@ class MixLogService {
 
     }
 
-    private function _getHeaders() {
+    private function _getHeaders()
+    {
         $headers = [
             "consumer-group" => $this->consumer_group,
             "consumer-name" => $this->application->consumer_name,
@@ -467,7 +483,8 @@ class MixLogService {
         return $headers;
     }
 
-    private function _getBaseUrl() {
+    private function _getBaseUrl()
+    {
         $base_url = sprintf($this->base_url, $this->application->tld);
 
         return $base_url;
@@ -477,7 +494,7 @@ class MixLogService {
      * Set the value of timeout
      *
      * @return  self
-     */ 
+     */
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
@@ -490,7 +507,7 @@ class MixLogService {
      * Set the value of min_bytes
      *
      * @return  self
-     */ 
+     */
     public function setMinBytes($min_bytes)
     {
         $this->min_bytes = $min_bytes;
@@ -502,7 +519,7 @@ class MixLogService {
      * Set the value of auto_commit
      *
      * @return  self
-     */ 
+     */
     public function setAutoCommit($auto_commit)
     {
         $this->auto_commit = $auto_commit;
@@ -514,7 +531,7 @@ class MixLogService {
      * Set the value of application
      *
      * @return  self
-     */ 
+     */
     public function setApplication(Application $application, $commitOffset = null)
     {
         $this->application = $application;

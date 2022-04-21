@@ -18,6 +18,7 @@ class LogJob implements ShouldQueue, ShouldBeUnique
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $application;
+    public $timeout = 0;
 
     /**
      * Create a new job instance.
