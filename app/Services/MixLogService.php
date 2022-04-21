@@ -434,12 +434,12 @@ class MixLogService
         info("Found " . count($logArray) . " logs, inserting");
         try {
             $chunks = array_chunk($logArray, 10);
-            foreach ($chunks as $chunk) {
-                info("Inserting chunk " . count($chunk));
-                DB::table('logs')->upsert($chunk, 'id');
-                info("Inserted " . count($chunk) . " logs");
-            }
-            // DB::table('logs')->upsert($logArray, 'id');
+            // foreach ($chunks as $chunk) {
+            //     info("Inserting chunk " . count($chunk));
+            //     DB::table('logs')->upsert($chunk, 'id');
+            //     info("Inserted " . count($chunk) . " logs");
+            // }
+            DB::table('logs')->upsert($logArray, 'id');
             
             $count = count($logArray);
             $lastLog = end($logArray);
