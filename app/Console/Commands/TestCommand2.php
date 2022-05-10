@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\LogJob;
+use App\Models\Application;
+use App\Facades\MixLogService;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
@@ -38,8 +41,9 @@ class TestCommand2 extends Command
      */
     public function handle()
     {
-        $date = Carbon::parse('2022-04-20T10:32:44.844Z')->setTimezone('Europe/London')->format('Y-m-d H:i:s.v');
-        dd($date);
+        $application = Application::find(4);
+        // dispatch( new LogJob( $application ) );
+        MixLogService::setApplication($application)->getRecords();
         return Command::SUCCESS;
     }
 }

@@ -431,6 +431,13 @@ class MixLogService
 
         }
 
+        if( $this->application->id == 4 ) {
+            FacadesLog::info("NLU: " . $nlu);
+            FacadesLog::info("DLG: " . $dlg);
+            FacadesLog::info("Project: " . $project);
+            FacadesLog::info("Project ID: " . $project_id);
+        }
+
         // info("Found " . count($logArray) . " logs, inserting");
         try {
             
