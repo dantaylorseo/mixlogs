@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Log;
 use App\Models\Session;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -32,8 +33,7 @@ class LogsTable extends Component
         if( !empty( $this->sessionid ) ) {
             $logs = $logs->where('sessionid', 'LIKE', '%'.$this->sessionid.'%');
         }
-        $logs = $logs->orderByDesc('timestamp')->withCount('logs')->paginate(20);
-        
+        $logs = $logs->withCount(['logs'])->orderByDesc('timestamp')->paginate(20);
         return view('livewire.logs-table', ['logs' => $logs]);
     }
 
