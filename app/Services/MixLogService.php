@@ -205,7 +205,7 @@ class MixLogService
         foreach( $partitions as $partition ) {
             $body['partitions'][] = [
                 "topic" => $clientIdParts[1],
-                "partition" => $partition['partition']
+                "partition" => $partition
             ];
         }
 
