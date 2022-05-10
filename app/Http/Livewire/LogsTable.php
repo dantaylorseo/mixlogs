@@ -22,7 +22,7 @@ class LogsTable extends Component
 
     public function render()
     {
-        $logs = Session::where('application_id', $this->application->id);
+        $logs = Session::where('application_id', $this->application->id)->where('project', '<>', 'n/a');
         // if( !empty( $this->textSearch ) ) {
         //     $logs = $logs->whereHas('logs', function($query) {
         //         $query->whereRaw("MATCH(`logs`.`data`) AGAINST(\"'$this->textSearch'\" IN BOOLEAN MODE)");
