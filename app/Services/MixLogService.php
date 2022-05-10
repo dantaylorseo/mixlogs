@@ -32,6 +32,8 @@ class MixLogService
 
     public ?Application $application = null;
 
+    private $partitions = [];
+
     /**
      * Authenticate the application
      *
@@ -175,20 +177,20 @@ class MixLogService
 
         $data = $response->json();
 
-        $this->_seekPartitionToEnd();
+        // $this->_seekPartitionToEnd();
 
         if( !empty( $data['partitions'] ) ) {
-            return $data['partitions'];
+            $this->partitions = $data['partitions'];
         } 
 
-        return [];
+        return $this;
 
     }
 
     private function _seekPartitionToEnd() {
         $clientIdParts = explode(':', $this->application->client_id);
 
-        $partitions = $this->_get_partitions();
+        $partitions = $this->partitions;
 
         $body = [
             "partitions" => []
@@ -220,7 +222,7 @@ class MixLogService
     {
         $clientIdParts = explode(':', $this->application->client_id);
 
-        $partitions = $this->_get_partitions();
+        $partitions = $this->partitions;
 
         $body = [
             "partitions" => []
@@ -609,6 +611,7 @@ class MixLogService
         $this->application = $application;
         $this->_generate_consumer_group_name();
         $this->_authenticate();
+        $this->_get_partitions();
         // $this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
