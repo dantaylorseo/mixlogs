@@ -433,12 +433,7 @@ class MixLogService
 
         // info("Found " . count($logArray) . " logs, inserting");
         try {
-            $chunks = array_chunk($logArray, 10);
-            // foreach ($chunks as $chunk) {
-            //     info("Inserting chunk " . count($chunk));
-            //     DB::table('logs')->upsert($chunk, 'id');
-            //     info("Inserted " . count($chunk) . " logs");
-            // }
+            
             DB::table('logs')->upsert($logArray, 'id');
             
             $count = count($logArray);
@@ -467,6 +462,7 @@ class MixLogService
                 $session->offset = $lastLog['offset'];
                 $session->save();
             } else {
+                FacadesLog::error("No session id for last log", ['log' => $lastLog]);
                 dump("not found");
             }
         } catch (Exception $e) {
