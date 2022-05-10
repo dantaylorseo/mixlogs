@@ -175,12 +175,22 @@ class MixLogService
 
         $data = $response->json();
 
+        $this->_getPartitionOffsets();
+
         if( !empty( $data['partitions'] ) ) {
             return $data['partitions'];
         } 
 
         return [];
 
+    }
+
+    private function _getPartitionOffsets() {
+        $partitions = $this->_get_partitions();
+        foreach( $partitions as $partition ) {
+            $response = Http::withHeaders($this->_getHeaders())->get($this->_getBaseUrl() . '/partitions/'.$partition.'/offsets');
+            FacadesLog::info("Partition $partition Offset", ['body' => $response->body()]);
+        }
     }
 
     public function test1(Application $application) {
