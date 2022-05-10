@@ -175,7 +175,7 @@ class MixLogService
 
         $data = $response->json();
 
-        $this->_getPartitionOffsets();
+        $this->_seekPartitionToEnd();
 
         if( !empty( $data['partitions'] ) ) {
             return $data['partitions'];
@@ -185,12 +185,25 @@ class MixLogService
 
     }
 
-    private function _getPartitionOffsets() {
+    private function _seekPartitionToEnd() {
+        $clientIdParts = explode(':', $this->application->client_id);
+
         $partitions = $this->_get_partitions();
+
+        $body = [
+            "partitions" => []
+        ];
+        
         foreach( $partitions as $partition ) {
-            $response = Http::withHeaders($this->_getHeaders())->get($this->_getBaseUrl() . '/partitions/'.$partition.'/offsets');
-            FacadesLog::info("Partition $partition Offset", ['body' => $response->body()]);
+            $body['partitions'][] = [
+                "topic" => $clientIdParts[1],
+                "partition" => $partition
+            ];
         }
+        dd($body);
+        $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/positions/end', $body);
+        dump($response);
+        return $this;
     }
 
     public function test1(Application $application) {
@@ -199,7 +212,8 @@ class MixLogService
         $this->_authenticate();
         // $this->_delete_consumer();
         $this->_create_consumer();
-        $this->_get_partitions();
+        // $this->_get_partitions();
+        $this->_seekPartitionToEnd();
     }
 
     private function _assignPartitions()
@@ -598,6 +612,7 @@ class MixLogService
         // $this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
+        $this->_seekPartitionToEnd();
         // $this->_subscribe();
         // if( !empty( $commitOffset ) )  $this->_commitOffset($commitOffset);
         //$this->resetOffset();
