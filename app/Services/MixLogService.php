@@ -162,18 +162,52 @@ class MixLogService
         $response->close();
     }
 
+    /** 
+     * Get Partitions for topic
+     */
+    private function _get_partitions() {
+        $response = Http::withHeaders($this->_getHeaders())->get($this->_getBaseUrl() . '/partitions');
+        
+        if (!$response->successful()) {
+            dump($response->body());
+            throw new MixLogException($response->status() . ": Error assigning parititions", $response->status());
+        }
+
+        $data = $response->json();
+
+        if( !empty( $data['partitions'] ) ) {
+            return $data['partitions'];
+        } 
+
+        return [];
+
+    }
+
+    public function test1(Application $application) {
+        $this->application = $application;
+        $this->_generate_consumer_group_name();
+        $this->_authenticate();
+        // $this->_delete_consumer();
+        $this->_create_consumer();
+        $this->_get_partitions();
+    }
+
     private function _assignPartitions()
     {
         $clientIdParts = explode(':', $this->application->client_id);
 
+        $partitions = $this->_get_partitions();
+
         $body = [
-            "partitions" => [
-                [
-                    "topic" => $clientIdParts[1],
-                    "partition" => 0,
-                ]
-            ]
+            "partitions" => []
         ];
+        
+        foreach( $partitions as $partition ) {
+            $body['partitions'][] = [
+                "topic" => $clientIdParts[1],
+                "partition" => $partition['partition']
+            ];
+        }
 
         $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/assignments', $body);
 
@@ -553,8 +587,8 @@ class MixLogService
         $this->_authenticate();
         // $this->_delete_consumer();
         $this->_create_consumer();
-        // $this->_assignPartitions();
-        $this->_subscribe();
+        $this->_assignPartitions();
+        // $this->_subscribe();
         // if( !empty( $commitOffset ) )  $this->_commitOffset($commitOffset);
         //$this->resetOffset();
         return $this;

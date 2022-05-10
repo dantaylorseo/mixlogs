@@ -15925,6 +15925,16 @@
          *
          * @static 
          */ 
+        public static function test1($application)
+        {
+                        /** @var \App\Services\MixLogService $instance */
+                        return $instance->test1($application);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
         public static function resetOffset()
         {
                         /** @var \App\Services\MixLogService $instance */

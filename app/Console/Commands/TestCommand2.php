@@ -43,7 +43,7 @@ class TestCommand2 extends Command
     {
         $application = Application::find(4);
         // dispatch( new LogJob( $application ) );
-        MixLogService::setApplication($application)->getRecords();
+        MixLogService::test1($application);
         return Command::SUCCESS;
     }
 }
