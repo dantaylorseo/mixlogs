@@ -49,6 +49,8 @@ class CleanupLogs extends Command
                 
             }
         });
+
+        //Comment
         return Command::SUCCESS;
     }
 }
