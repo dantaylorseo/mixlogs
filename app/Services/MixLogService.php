@@ -200,7 +200,7 @@ class MixLogService
                 "partition" => $partition
             ];
         }
-        dd($body);
+        dump($body);
         $response = Http::withHeaders($this->_getHeaders())->post($this->_getBaseUrl() . '/consumers/positions/end', $body);
         dump($response);
         return $this;
