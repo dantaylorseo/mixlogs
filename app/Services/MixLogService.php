@@ -529,7 +529,7 @@ class MixLogService
                 $session->offset = $lastLog['offset'];
                 $session->save();
             } else {
-                FacadesLog::error("No session id for last log", ['log' => $lastLog]);
+                // FacadesLog::error("No session id for last log", ['log' => $lastLog]);
                 dump("not found");
             }
         } catch (Exception $e) {
