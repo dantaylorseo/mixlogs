@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use DB;
 use App\Models\Log;
 use App\Models\Session;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
+use Spatie\LaravelQueuedDbCleanup\CleanDatabaseJobFactory;
 
 class CleanupLogs extends Command
 {
@@ -42,13 +44,27 @@ class CleanupLogs extends Command
     {
         $this->info('Cleaning up logs...');
         $this->info('Deleting logs older than 4 days...');
-        Session::where('timestamp', '<', Carbon::now()->subDays(4))->chunk(200, function ($sessions) {
-            foreach ($sessions as $session) {
-                $session->logs()->delete();
-                $session->delete();
+        // Session::where('timestamp', '<', Carbon::now()->subDays(4))->chunk(200, function ($sessions) {
+        //     foreach ($sessions as $session) {
+        //         $this->info('Deleting session ' . $session->sessionid);
+        //         $session->logs()->delete();
+        //         $session->delete();
                 
-            }
-        });
+        //     }
+        // });
+
+        // DB::table('sessions')->where('timestamp', '<', now()->subDays(4))->delete();
+        // DB::table('logs')->where('timestamp', '<', now()->subDays(4))->delete();
+
+        CleanDatabaseJobFactory::new()
+        ->query(Session::query()->where('timestamp', '<',  now()->subDays(4)->toDateTimeString()))
+        ->deleteChunkSize(1000)
+        ->dispatch();
+
+        CleanDatabaseJobFactory::new()
+        ->query(Log::query()->where('timestamp', '<',  now()->subDays(4)->toDateTimeString()))
+        ->deleteChunkSize(1000)
+        ->dispatch();
 
         //Comment
         return Command::SUCCESS;
