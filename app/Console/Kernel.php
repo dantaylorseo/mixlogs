@@ -28,12 +28,11 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('testcommand')->everyMinute();
         $schedule->command('cleanup')->dailyAt('00:00');
-        $schedule->command('queue:restart')->hourly();
     }
 
     protected function shortSchedule(ShortSchedule $shortSchedule)
     {
-        $shortSchedule->command('testcommand')->everySeconds(15);
+        $shortSchedule->command('testcommand')->between('04:00', '23:30')->everySeconds(15);
     }
 
     /**
