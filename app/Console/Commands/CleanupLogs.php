@@ -59,11 +59,15 @@ class CleanupLogs extends Command
         CleanDatabaseJobFactory::new()
         ->query(Session::query()->where('timestamp', '<',  now()->subDays(4)->toDateTimeString()))
         ->deleteChunkSize(1000)
+        ->getBatch()
+        ->onQueue('session_cleanups')
         ->dispatch();
 
         CleanDatabaseJobFactory::new()
         ->query(Log::query()->where('timestamp', '<',  now()->subDays(4)->toDateTimeString()))
         ->deleteChunkSize(1000)
+        ->getBatch()
+        ->onQueue('log_cleanups')
         ->dispatch();
 
         //Comment
