@@ -32,7 +32,7 @@ class C3AppController extends Controller
         ->withHeaders([
             'Authorization' => 'Basic ' . base64_encode('portalUiClientId:portalUiClientSecret'),
         ])
-        ->asForm()->post('https://webhook.site/667f191a-e975-47e2-b419-5e1e55d78662', [
+        ->asForm()->post('https://auth-us1.digital.nuance.com/oauth-server/oauth/token', [
             'grant_type' => 'password',
             'username' => 'dtaylor',
             'password' => 'Biscuits23!@',
