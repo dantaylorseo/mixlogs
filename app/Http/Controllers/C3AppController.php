@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Str;
 
 class C3AppController extends Controller
 {
@@ -25,8 +26,13 @@ class C3AppController extends Controller
 
     private function getAccessToken()
     {
+        // dd( base64_encode('portalUiClientId:portalUiClientSecret'));
         $response = Http::accept('application/json')
-        ->withBasicAuth('portalClientId', 'portalClientSecret')
+        // ->withBasicAuth('portalClientId', 'portalClientSecret')
+        ->withHeaders([
+            'Authorization' => 'Basic ' . base64_encode('portalUiClientId:portalUiClientSecret'),
+        ])
+        ])
         ->asForm()->post('https://webhook.site/667f191a-e975-47e2-b419-5e1e55d78662', [
             'grant_type' => 'password',
             'username' => 'dtaylor',
