@@ -15,6 +15,9 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Applications') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('c3apps')" :active="request()->routeIs('c3apps')">
+                        {{ __('C3 Apps') }}
+                    </x-nav-link>
                 </div>
             </div>
 

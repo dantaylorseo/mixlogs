@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\C3AppController;
 use App\Models\Application;
 use App\Models\Log;
 use Illuminate\Support\Facades\Route;
@@ -96,5 +97,7 @@ Route::get('log/{sessionid}/download', function( $sessionid ) {
 Route::get('/logs/{application}', function (Application $application) {
     return view('logs-list', ['application' => $application]);
 })->middleware(['auth'])->name('logs');
+
+Route::get('c3apps', [ C3AppController::class, 'getAllApps' ])->middleware(['auth'])->name('c3apps');
 
 require __DIR__.'/auth.php';
