@@ -612,7 +612,7 @@ class MixLogService
         $this->_generate_consumer_group_name();
         $this->_authenticate();
         $this->_get_partitions();
-        $this->_delete_consumer();
+        // $this->_delete_consumer();
         $this->_create_consumer();
         $this->_assignPartitions();
         // $this->_seekPartitionToEnd();
