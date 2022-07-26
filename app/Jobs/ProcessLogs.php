@@ -62,7 +62,7 @@ class ProcessLogs implements ShouldQueue
         $c3 = "n/a";
         $project = "n/a";
         $project_id = "n/a";
-
+        info("(" . $this->application->name . ") Looping " . $this->logs->count() . " rows");
         foreach( $this->logs as $log ) {
             // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
             $logArray[] = [
@@ -113,8 +113,9 @@ class ProcessLogs implements ShouldQueue
             
             
         }
-
+            info("(" . $this->application->name . ") Inserting " . count($logArray) . " rows");
             DB::table('logs')->upsert( $logArray, 'id' );
+            info("(" . $this->application->name . ") Inserted " . count($logArray) . " rows");
             $count = count( $logArray );
             $lastLog = end( $logArray );
             if( !empty( $lastLog['sessionid'] ) ) {
