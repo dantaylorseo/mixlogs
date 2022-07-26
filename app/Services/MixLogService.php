@@ -441,7 +441,7 @@ class MixLogService
         $project_id = "n/a";
 
         // info("Processing " . count($logs) . " logs");
-
+        info("(" . $this->application->name . ") Looping " . $logs->count() . " rows");
         foreach ($logs as $log) {
             // if(Carbon::parse($log['value']['timestamp'])->isBefore(Carbon::now()->startOfDay())) continue;
             $logArray[] = [
@@ -501,7 +501,12 @@ class MixLogService
         // info("Found " . count($logArray) . " logs, inserting");
         try {
             
-            DB::table('logs')->upsert($logArray, 'id');
+
+            info("(" . $this->application->name . ") Inserting " . count($logArray) . " rows");
+            DB::table('logs')->upsert( $logArray, 'id' );
+            info("(" . $this->application->name . ") Inserted " . count($logArray) . " rows");
+
+            // DB::table('logs')->upsert($logArray, 'id');
             
             $count = count($logArray);
             $lastLog = end($logArray);
