@@ -383,7 +383,7 @@ class MixLogService
                 return !empty($item['value']['data']['sessionid']) ? $item['value']['data']['sessionid'] : (!empty($item['value']['data']['request']['clientData']['x-nuance-dialog-session-id']) ? $item['value']['data']['request']['clientData']['x-nuance-dialog-session-id'] : "n/a");
             });
 
-            info("Adding " . $logChunks->count() . " sessions");
+            info("(" . $this->application->name . ") Adding " . $logChunks->count() . " sessions");
             foreach ($logChunks as $chunk) {
                 // dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');   
                 $this->processLogs($chunk->all());
