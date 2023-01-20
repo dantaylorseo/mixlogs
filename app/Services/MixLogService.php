@@ -164,12 +164,12 @@ class MixLogService
         $response->close();
     }
 
-    /** 
+    /**
      * Get Partitions for topic
      */
     private function _get_partitions() {
         $response = Http::withHeaders($this->_getHeaders())->get($this->_getBaseUrl() . '/partitions');
-        
+
         if (!$response->successful()) {
             dump($response->body());
             throw new MixLogException($response->status() . ": Error assigning parititions", $response->status());
@@ -181,7 +181,7 @@ class MixLogService
 
         if( !empty( $data['partitions'] ) ) {
             $this->partitions = $data['partitions'];
-        } 
+        }
 
         return $this;
 
@@ -195,7 +195,7 @@ class MixLogService
         $body = [
             "partitions" => []
         ];
-        
+
         foreach( $partitions as $partition ) {
             $body['partitions'][] = [
                 "topic" => $clientIdParts[1],
@@ -227,7 +227,7 @@ class MixLogService
         $body = [
             "partitions" => []
         ];
-        
+
         foreach( $partitions as $partition ) {
             $body['partitions'][] = [
                 "topic" => $clientIdParts[1],
@@ -348,7 +348,7 @@ class MixLogService
         //     Logger::info( "(".$this->application->name.") - Committed Offset" );
         // } else {
         //     Logger::info( "(".$this->application->name.") - NO Offset" );
-        // } 
+        // }
 
         $response = Http::withHeaders($this->_getHeaders())->timeout(30)->get($this->_getBaseUrl() . '/consumers/records');
 
@@ -385,7 +385,7 @@ class MixLogService
 
             info("(" . $this->application->name . ") Adding " . $logChunks->count() . " sessions");
             foreach ($logChunks as $chunk) {
-                // dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');   
+                // dispatch( new ProcessLogs($this->application, $chunk->all() ) )->onQueue('logs');
                 $this->processLogs($chunk->all());
             }
 
@@ -500,14 +500,14 @@ class MixLogService
 
         // info("Found " . count($logArray) . " logs, inserting");
         try {
-            
+
 
             info("(" . $this->application->name . ") - Inserting " . count($logArray) . " rows");
             DB::table('logs')->upsert( $logArray, 'id' );
             info("(" . $this->application->name . ") - Inserted " . count($logArray) . " rows");
 
             // DB::table('logs')->upsert($logArray, 'id');
-            
+
             $count = count($logArray);
             $lastLog = end($logArray);
             // info("Inserted " . $count . " logs");
