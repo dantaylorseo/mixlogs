@@ -42,15 +42,8 @@ class TestCommand extends Command
     public function handle()
     {
         foreach(Application::all() as $application) {
-            //MixLogService::setApplication($application)->getRecords();
-//            dispatch(new LogJob($application))->onQueue('apps');
-            try {
-                LogJob::dispatch($application);
-                info("Added " . $application->name . " to queue");
-            } catch (\Exception $e) {
-                Log::error("LogJob failed for Application: " . $application->name . ". Error: " . $e->getMessage());
-                info("LogJob failed for Application: " . $application->name . ". Error: " . $e->getMessage());
-            }
+            MixLogService::setApplication($application)->getRecords();
+//            dispatch( new LogJob( $application ) )->onQueue('apps');
         }
         return Command::SUCCESS;
     }
