@@ -46,7 +46,7 @@ class TestCommand extends Command
             info("Added " . $application->name . " to queue");
 //            dispatch(new LogJob($application))->onQueue('apps');
             try {
-                LogJob::dispatch($application)->onQueue('apps');
+                LogJob::dispatch($application);
             } catch (\Exception $e) {
                 Log::error("LogJob failed for Application: " . $application->name . ". Error: " . $e->getMessage());
             }
