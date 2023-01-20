@@ -26,7 +26,8 @@ class CreateLogsTable extends Migration
             $table->string('locale')->nullable();
             $table->integer('seqid')->nullable();
             $table->integer('offset');
-            $table->json('events')->nullable();
+            $table->integer('partition');
+            // $table->json('events')->nullable();
             $table->json('request')->nullable();
             $table->json('response')->nullable();
             $table->json('data')->nullable();

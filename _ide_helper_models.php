@@ -47,6 +47,31 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\Event
+ *
+ * @property int $id
+ * @property string $log_id
+ * @property int $eventable_id
+ * @property string $eventable_type
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $eventable
+ * @property-read \App\Models\Log $log
+ * @method static \Illuminate\Database\Eloquent\Builder|Event newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Event newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Event query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereEventableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereEventableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereLogId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Event whereUpdatedAt($value)
+ */
+	class Event extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Log
  *
  * @property string $id
@@ -61,21 +86,25 @@ namespace App\Models{
  * @property string|null $locale
  * @property int|null $seqid
  * @property int $offset
- * @property object|null $events
+ * @property int $partition
  * @property object|null $request
  * @property object|null $response
  * @property object|null $data
  * @property-read \App\Models\Application $application
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Event[] $events
+ * @property-read int|null $events_count
+ * @property-read mixed $log_type
+ * @property-read \App\Models\Session|null $session
  * @method static \Illuminate\Database\Eloquent\Builder|Log newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Log newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Log query()
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereAppid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereApplicationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereData($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Log whereEvents($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereLocale($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereOffset($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Log wherePartition($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereRequest($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereRequestid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereResponse($value)
@@ -87,6 +116,57 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Log whereTraceid($value)
  */
 	class Log extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Session
+ *
+ * @property string $sessionid
+ * @property int $application_id
+ * @property \Illuminate\Support\Carbon $timestamp
+ * @property int $records
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Log[] $logs
+ * @property-read int|null $logs_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Session newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Session newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Session query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Session whereApplicationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Session whereRecords($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Session whereSessionid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Session whereTimestamp($value)
+ */
+	class Session extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Transition
+ *
+ * @property int $id
+ * @property string $from
+ * @property string $from_name
+ * @property string $from_type
+ * @property string $to
+ * @property string $to_name
+ * @property string $to_type
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Event|null $event
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereFrom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereFromName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereFromType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereTo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereToName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereToType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Transition whereUpdatedAt($value)
+ */
+	class Transition extends \Eloquent {}
 }
 
 namespace App\Models{

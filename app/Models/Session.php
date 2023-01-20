@@ -11,6 +11,8 @@ class Session extends Model
 
     public $incrementing = false;
     protected $primaryKey = 'sessionid';
+    public $keyType = 'string';
+    
     public $timestamps = false;
 
     protected $guarded = [];
