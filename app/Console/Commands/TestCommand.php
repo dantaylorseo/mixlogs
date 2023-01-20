@@ -43,12 +43,13 @@ class TestCommand extends Command
     {
         foreach(Application::all() as $application) {
             //MixLogService::setApplication($application)->getRecords();
-            info("Added " . $application->name . " to queue");
 //            dispatch(new LogJob($application))->onQueue('apps');
             try {
                 LogJob::dispatch($application);
+                info("Added " . $application->name . " to queue");
             } catch (\Exception $e) {
                 Log::error("LogJob failed for Application: " . $application->name . ". Error: " . $e->getMessage());
+                info("LogJob failed for Application: " . $application->name . ". Error: " . $e->getMessage());
             }
         }
         return Command::SUCCESS;
