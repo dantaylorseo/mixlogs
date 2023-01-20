@@ -56,5 +56,4 @@ class LogJob implements ShouldQueue, ShouldBeUnique
         Log::error("LogJob failed for Application: " . $this->application->name . ". Error: " . $exception->getMessage());
     }
 
-
 }
