@@ -538,8 +538,7 @@ class MixLogService
                 dump("not found");
             }
         } catch (Exception $e) {
-            dump("catch");
-            dump($e->getMessage());
+            info("catch");
             FacadesLog::error($e->getMessage());
         }
 
